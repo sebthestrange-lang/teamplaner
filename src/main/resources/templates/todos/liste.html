@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}"
+      lang="de">
+<head><title>Todos</title></head>
+<body>
+<main layout:fragment="content">
+
+    <div class="page-header mb-4">
+        <h1 class="page-title">Todos</h1>
+    </div>
+
+    <!-- Schnell-Anlegen -->
+    <div class="card card-custom mb-4">
+        <div class="card-body py-3">
+            <form th:action="@{/todos}" method="post" th:object="${schnellTodo}"
+                  class="row g-2 align-items-end">
+                <div class="col-md-5">
+                    <input type="text" th:field="*{titel}"
+                           th:class="'form-control' + (${#fields.hasErrors('titel')} ? ' is-invalid' : '')"
+                           placeholder="Neues Todo eingeben...">
+                    <div th:if="${#fields.hasErrors('titel')}" class="invalid-feedback"
+                         th:errors="*{titel}"></div>
+                </div>
+                <div class="col-md-3">
+                    <select th:field="*{prioritaet}" class="form-select">
+                        <option th:each="p : ${prioritaeten}" th:value="${p.name()}"
+                                th:text="${p.bezeichnung}"></option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <input type="date" th:field="*{faelligAm}" class="form-control">
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="bi bi-plus-lg me-1"></i>Hinzufügen
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Filter -->
+    <div class="card card-custom mb-4">
+        <div class="card-body py-2">
+            <form th:action="@{/todos}" method="get" class="d-flex gap-2 align-items-center flex-wrap">
+                <!-- Status-Filter Buttons -->
+                <div class="btn-group btn-group-sm" role="group">
+                    <a th:href="@{/todos}" class="btn"
+                       th:class="'btn btn-sm ' + (${filter.status == null or filter.status == ''} ? 'btn-primary' : 'btn-outline-secondary')">
+                        Alle
+                    </a>
+                    <a th:href="@{/todos(status='offen')}" class="btn"
+                       th:class="'btn btn-sm ' + (${filter.status == 'offen'} ? 'btn-primary' : 'btn-outline-secondary')">
+                        Offen
+                    </a>
+                    <a th:href="@{/todos(status='erledigt')}" class="btn"
+                       th:class="'btn btn-sm ' + (${filter.status == 'erledigt'} ? 'btn-success' : 'btn-outline-secondary')">
+                        Erledigt
+                    </a>
+                    <a th:href="@{/todos(status='ueberfaellig')}" class="btn"
+                       th:class="'btn btn-sm ' + (${filter.status == 'ueberfaellig'} ? 'btn-danger' : 'btn-outline-secondary')">
+                        Überfällig
+                    </a>
+                    <a th:href="@{/todos(status='heute')}" class="btn"
+                       th:class="'btn btn-sm ' + (${filter.status == 'heute'} ? 'btn-warning' : 'btn-outline-secondary')">
+                        Heute
+                    </a>
+                </div>
+
+                <!-- Priorität -->
+                <select name="prioritaet" class="form-select form-select-sm" style="width:auto"
+                        onchange="this.form.submit()">
+                    <option value="">Alle Prioritäten</option>
+                    <option th:each="p : ${prioritaeten}" th:value="${p.name()}"
+                            th:text="${p.bezeichnung}"
+                            th:selected="${filter.prioritaet == p}"></option>
+                </select>
+
+                <!-- Suche -->
+                <div class="d-flex gap-1 flex-grow-1">
+                    <input type="text" name="suche" class="form-control form-control-sm"
+                           placeholder="Suchen..." th:value="${filter.suche}">
+                    <button type="submit" class="btn btn-sm btn-outline-secondary">
+                        <i class="bi bi-search"></i>
+                    </button>
+                    <a th:href="@{/todos}" class="btn btn-sm btn-light">
+                        <i class="bi bi-x-lg"></i>
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Leerer Zustand -->
+    <div th:if="${#lists.isEmpty(todos)}" class="empty-state card-custom">
+        <i class="bi bi-check2-all text-muted" style="font-size:3rem"></i>
+        <h5 class="mt-3 text-muted">Keine Todos gefunden</h5>
+    </div>
+
+    <!-- Todo-Karten -->
+    <div th:unless="${#lists.isEmpty(todos)}" class="row g-3">
+        <div th:each="todo : ${todos}" class="col-md-6 col-xl-4">
+            <div class="card todo-card h-100"
+                 th:classappend="${todo.erledigt} ? ' todo-erledigt' : (${todo.faelligAm != null and todo.faelligAm.isBefore(#temporals.createToday())} ? ' todo-ueberfaellig' : (${todo.faelligAm != null and todo.faelligAm.isEqual(#temporals.createToday())} ? ' todo-heute' : ''))"
+                 th:style="'border-left: 4px solid ' + ${todo.prioritaet.farbe}">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <h6 class="mb-0 fw-semibold"
+                            th:class="'mb-0 fw-semibold' + (${todo.erledigt} ? ' text-decoration-line-through text-muted' : '')"
+                            th:text="${todo.titel}"></h6>
+                        <span class="badge rounded-pill ms-2 flex-shrink-0"
+                              th:style="'background-color:' + ${todo.prioritaet.farbe} + '22; color:' + ${todo.prioritaet.farbe}"
+                              th:text="${todo.prioritaet.bezeichnung}"></span>
+                    </div>
+
+                    <div th:if="${todo.faelligAm}" class="small mb-1"
+                         th:class="'small mb-1 ' + (${todo.faelligAm.isBefore(#temporals.createToday()) and !todo.erledigt} ? 'text-danger fw-medium' : 'text-muted')">
+                        <i class="bi bi-calendar3 me-1"></i>
+                        <span th:text="${#temporals.format(todo.faelligAm, 'dd.MM.yyyy')}"></span>
+                        <span th:if="${todo.faelligAm.isBefore(#temporals.createToday()) and !todo.erledigt}">
+                            ⚠️
+                        </span>
+                    </div>
+
+                    <div th:if="${todo.erledigt and todo.erledigtAm != null}" class="small text-muted">
+                        Erledigt: <span th:text="${#temporals.format(todo.erledigtAm, 'dd.MM.yyyy')}"></span>
+                    </div>
+                </div>
+                <div class="card-footer bg-transparent border-top-0 pt-0 pb-3 px-3 d-flex gap-2">
+                    <!-- Toggle erledigt -->
+                    <form th:action="@{/todos/{id}/erledigt(id=${todo.id})}" method="post" class="flex-grow-1">
+                        <button type="submit"
+                                th:class="'btn btn-sm w-100 ' + (${todo.erledigt} ? 'btn-outline-secondary' : 'btn-outline-success')">
+                            <i th:class="'bi ' + (${todo.erledigt} ? 'bi-arrow-counterclockwise' : 'bi-check-lg')"></i>
+                            <span th:text="${todo.erledigt} ? 'Wiederöffnen' : 'Erledigt'"></span>
+                        </button>
+                    </form>
+                    <a th:href="@{/todos/{id}/bearbeiten(id=${todo.id})}" class="btn btn-sm btn-outline-primary">
+                        <i class="bi bi-pencil"></i>
+                    </a>
+                    <button type="button" class="btn btn-sm btn-outline-danger"
+                            th:onclick="'loeschenBestaetigen(\'/todos/' + ${todo.id} + '/loeschen\')'">
+                        <i class="bi bi-trash"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</main>
+</body>
+</html>

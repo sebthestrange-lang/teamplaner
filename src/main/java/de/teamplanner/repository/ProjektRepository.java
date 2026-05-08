@@ -1,0 +1,23 @@
+package de.teamplanner.repository;
+
+import de.teamplanner.model.Projekt;
+import de.teamplanner.model.Team;
+import de.teamplanner.model.enums.ProjektStatus;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.stereotype.Repository;
+
+import java.util.List;
+
+@Repository
+public interface ProjektRepository extends JpaRepository<Projekt, Long>,
+        JpaSpecificationExecutor<Projekt> {
+
+    List<Projekt> findByTeam(Team team);
+
+    List<Projekt> findByStatus(ProjektStatus status);
+
+    List<Projekt> findByTeamAndStatus(Team team, ProjektStatus status);
+
+    long countByStatus(ProjektStatus status);
+}

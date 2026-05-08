@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="de">
+<body>
+
+<nav th:fragment="sidebar"
+     id="mainSidebar"
+     class="sidebar offcanvas-lg offcanvas-start d-flex flex-column"
+     tabindex="-1"
+     aria-labelledby="mainSidebarLabel">
+
+    <!-- Mobile: Offcanvas Header with close button -->
+    <div class="offcanvas-header sidebar-logo d-lg-none">
+        <a th:href="@{/}" class="text-decoration-none d-flex align-items-center gap-2">
+            <div class="logo-icon">
+                <i class="bi bi-kanban-fill"></i>
+            </div>
+            <span class="logo-text" id="mainSidebarLabel">Teamplanner</span>
+        </a>
+        <button type="button" class="btn-close btn-close-white"
+                data-bs-dismiss="offcanvas" data-bs-target="#mainSidebar"
+                aria-label="Schließen"></button>
+    </div>
+
+    <!-- Desktop: Logo -->
+    <div class="sidebar-logo d-none d-lg-flex align-items-center">
+        <a th:href="@{/}" class="text-decoration-none d-flex align-items-center gap-2">
+            <div class="logo-icon">
+                <i class="bi bi-kanban-fill"></i>
+            </div>
+            <span class="logo-text">Teamplanner</span>
+        </a>
+    </div>
+
+    <!-- Navigation -->
+    <ul class="nav flex-column sidebar-nav px-3 flex-grow-1">
+
+        <li class="nav-item">
+            <a th:href="@{/}"
+               th:classappend="${currentUri == '/'} ? 'active' : ''"
+               class="nav-link sidebar-link">
+                <i class="bi bi-speedometer2"></i>
+                <span>Dashboard</span>
+            </a>
+        </li>
+
+        <li class="sidebar-section-label">Verwaltung</li>
+
+        <li class="nav-item">
+            <a th:href="@{/teams}"
+               th:classappend="${currentUri.startsWith('/teams')} ? 'active' : ''"
+               class="nav-link sidebar-link">
+                <i class="bi bi-people-fill"></i>
+                <span>Teams</span>
+            </a>
+        </li>
+
+        <li class="nav-item">
+            <a th:href="@{/mitarbeiter}"
+               th:classappend="${currentUri.startsWith('/mitarbeiter')} ? 'active' : ''"
+               class="nav-link sidebar-link">
+                <i class="bi bi-person-badge-fill"></i>
+                <span>Mitarbeiter</span>
+            </a>
+        </li>
+
+        <li class="nav-item">
+            <a th:href="@{/projekte}"
+               th:classappend="${currentUri.startsWith('/projekte')} ? 'active' : ''"
+               class="nav-link sidebar-link">
+                <i class="bi bi-folder2-open"></i>
+                <span>Projekte</span>
+            </a>
+        </li>
+
+        <li class="sidebar-section-label">Aufgaben</li>
+
+        <li class="nav-item">
+            <a th:href="@{/aufgaben}"
+               th:classappend="${currentUri.startsWith('/aufgaben')} ? 'active' : ''"
+               class="nav-link sidebar-link d-flex justify-content-between align-items-center">
+                <span><i class="bi bi-check2-square me-2"></i>Aufgaben</span>
+                <span th:if="${sidebarUeberfaelligeAufgaben > 0}"
+                      th:text="${sidebarUeberfaelligeAufgaben}"
+                      class="badge badge-danger-soft">0</span>
+            </a>
+        </li>
+
+        <li class="nav-item">
+            <a th:href="@{/todos}"
+               th:classappend="${currentUri.startsWith('/todos')} ? 'active' : ''"
+               class="nav-link sidebar-link d-flex justify-content-between align-items-center">
+                <span><i class="bi bi-list-check me-2"></i>Todos</span>
+                <span th:if="${sidebarOffeneTodos > 0}"
+                      th:text="${sidebarOffeneTodos}"
+                      class="badge badge-primary-soft">0</span>
+            </a>
+        </li>
+    </ul>
+
+    <!-- Footer -->
+    <div class="sidebar-footer">
+        <small class="text-muted">v1.0.0</small>
+    </div>
+</nav>
+
+</body>
+</html>

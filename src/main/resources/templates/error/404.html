@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}"
+      lang="de">
+<head><title>Nicht gefunden</title></head>
+<body>
+<main layout:fragment="content">
+    <div class="empty-state" style="padding: 5rem 0">
+        <div style="font-size:5rem; color:#6366f1">404</div>
+        <h2 class="mt-2">Nicht gefunden</h2>
+        <p class="text-muted" th:text="${fehler ?: 'Die gesuchte Seite existiert nicht.'}"></p>
+        <a th:href="@{/}" class="btn btn-primary mt-2">Zum Dashboard</a>
+    </div>
+</main>
+</body>
+</html>

@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}"
+      lang="de">
+<head><title th:text="${aktion}">Aufgabe</title></head>
+<body>
+<main layout:fragment="content">
+
+    <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a th:href="@{/aufgaben}">Aufgaben</a></li>
+            <li class="breadcrumb-item active" th:text="${aktion}"></li>
+        </ol>
+    </nav>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card card-custom">
+                <div class="card-header-custom">
+                    <h5 class="mb-0" th:text="${aktion}"></h5>
+                </div>
+                <div class="card-body">
+                    <form th:action="${aufgabe.id != null} ? @{/aufgaben/{id}(id=${aufgabe.id})} : @{/aufgaben}"
+                          th:object="${aufgabe}" method="post">
+
+                        <div class="mb-3">
+                            <label for="titel" class="form-label">Titel <span class="text-danger">*</span></label>
+                            <input type="text" id="titel" th:field="*{titel}"
+                                   th:class="'form-control' + (${#fields.hasErrors('titel')} ? ' is-invalid' : '')"
+                                   placeholder="Was ist zu tun?">
+                            <div th:if="${#fields.hasErrors('titel')}" class="invalid-feedback"
+                                 th:errors="*{titel}"></div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="beschreibung" class="form-label">Beschreibung</label>
+                            <textarea id="beschreibung" th:field="*{beschreibung}"
+                                      class="form-control" rows="3"
+                                      placeholder="Detaillierte Beschreibung..."></textarea>
+                        </div>
+
+                        <div class="row g-3 mb-3">
+                            <div class="col-sm-6">
+                                <label for="projekt" class="form-label">Projekt</label>
+                                <select id="projekt" th:field="*{projekt}" class="form-select">
+                                    <option value="">Kein Projekt</option>
+                                    <option th:each="p : ${projekte}" th:value="${p.id}"
+                                            th:text="${p.name}"></option>
+                                </select>
+                            </div>
+                            <div class="col-sm-6">
+                                <label for="mitarbeiterSelect" class="form-label">Mitarbeiter</label>
+                                <select id="mitarbeiterSelect" th:field="*{mitarbeiter}" class="form-select">
+                                    <option value="">Nicht zugewiesen</option>
+                                    <option th:each="ma : ${mitarbeiter}" th:value="${ma.id}"
+                                            th:text="${ma.vollstaendigerName}"></option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="row g-3 mb-3">
+                            <div class="col-sm-4">
+                                <label for="prioritaet" class="form-label">Priorität <span class="text-danger">*</span></label>
+                                <select id="prioritaet" th:field="*{prioritaet}"
+                                        th:class="'form-select' + (${#fields.hasErrors('prioritaet')} ? ' is-invalid' : '')">
+                                    <option th:each="p : ${prioritaeten}" th:value="${p.name()}"
+                                            th:text="${p.bezeichnung}"></option>
+                                </select>
+                            </div>
+                            <div class="col-sm-4">
+                                <label for="status" class="form-label">Status <span class="text-danger">*</span></label>
+                                <select id="status" th:field="*{status}"
+                                        th:class="'form-select' + (${#fields.hasErrors('status')} ? ' is-invalid' : '')">
+                                    <option th:each="s : ${aufgabenStatus}" th:value="${s.name()}"
+                                            th:text="${s.bezeichnung}"></option>
+                                </select>
+                            </div>
+                            <div class="col-sm-4">
+                                <label for="faelligAm" class="form-label">Fällig am</label>
+                                <input type="date" id="faelligAm" th:field="*{faelligAm}"
+                                       class="form-control">
+                            </div>
+                        </div>
+
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-check-lg me-1"></i>Speichern
+                            </button>
+                            <a th:href="@{/aufgaben}" class="btn btn-light">Abbrechen</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</main>
+</body>
+</html>

@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}"
+      lang="de">
+<head><title th:text="${team.name}">Team</title></head>
+<body>
+<main layout:fragment="content">
+
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a th:href="@{/teams}">Teams</a></li>
+            <li class="breadcrumb-item active" th:text="${team.name}"></li>
+        </ol>
+    </nav>
+
+    <!-- Header -->
+    <div class="page-header mb-4 d-flex justify-content-between align-items-start">
+        <div class="d-flex align-items-center gap-3">
+            <div class="team-color-dot lg" th:style="'background-color:' + ${team.farbe}"></div>
+            <div>
+                <h1 class="page-title mb-0" th:text="${team.name}"></h1>
+                <small class="text-muted">
+                    Erstellt am <span th:text="${#temporals.format(team.erstelltAm, 'dd.MM.yyyy')}"></span>
+                    &middot;
+                    <span th:text="${#lists.size(mitarbeiter)}"></span> Mitarbeiter
+                </small>
+            </div>
+        </div>
+        <div class="d-flex gap-2">
+            <a th:href="@{/teams/{id}/bearbeiten(id=${team.id})}" class="btn btn-outline-primary">
+                <i class="bi bi-pencil me-1"></i>Bearbeiten
+            </a>
+            <button type="button" class="btn btn-outline-danger"
+                    th:onclick="'loeschenBestaetigen(\'/teams/' + ${team.id} + '/loeschen\')'">
+                <i class="bi bi-trash me-1"></i>Löschen
+            </button>
+        </div>
+    </div>
+
+    <!-- Auslastung Stats -->
+    <div class="row g-3 mb-4">
+        <div class="col-sm-6 col-lg-3">
+            <div class="card card-custom text-center py-3">
+                <div class="fs-2 fw-bold text-secondary" th:text="${auslastung.offen()}"></div>
+                <div class="small text-muted">Offen</div>
+            </div>
+        </div>
+        <div class="col-sm-6 col-lg-3">
+            <div class="card card-custom text-center py-3">
+                <div class="fs-2 fw-bold text-primary" th:text="${auslastung.inBearbeitung()}"></div>
+                <div class="small text-muted">In Bearbeitung</div>
+            </div>
+        </div>
+        <div class="col-sm-6 col-lg-3">
+            <div class="card card-custom text-center py-3">
+                <div class="fs-2 fw-bold text-success" th:text="${auslastung.abgeschlossen()}"></div>
+                <div class="small text-muted">Abgeschlossen</div>
+            </div>
+        </div>
+        <div class="col-sm-6 col-lg-3">
+            <div class="card card-custom py-3 px-3">
+                <div class="d-flex justify-content-between align-items-baseline mb-1">
+                    <span class="small text-muted">Auslastung</span>
+                    <span class="fw-bold"
+                          th:text="${auslastung.auslastungProzent()} + '%'"></span>
+                </div>
+                <div class="progress mb-1" style="height:8px">
+                    <div th:class="'progress-bar bg-' + ${auslastung.bootstrapFarbe()}"
+                         role="progressbar"
+                         th:style="'width:' + ${auslastung.auslastungProzent()} + '%'"
+                         th:attr="aria-valuenow=${auslastung.auslastungProzent()}"
+                         aria-valuemin="0" aria-valuemax="100"></div>
+                </div>
+                <div class="small text-muted text-center"
+                     th:text="${auslastung.aktiv()} + ' von ' + ${auslastung.gesamt()} + ' Aufgaben aktiv'"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4">
+
+        <!-- Mitarbeiter-Karte -->
+        <div class="col-lg-6">
+            <div class="card card-custom">
+                <div class="card-header-custom d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">
+                        <i class="bi bi-person-badge-fill me-2"></i>Mitarbeiter
+                        <span th:if="${!#lists.isEmpty(mitarbeiter)}"
+                              class="badge rounded-pill bg-primary-soft text-primary ms-1"
+                              th:text="${#lists.size(mitarbeiter)}"></span>
+                    </h5>
+                    <a th:href="@{/mitarbeiter/neu}" class="btn btn-sm btn-outline-primary"
+                       title="Neuen Mitarbeiter anlegen">
+                        <i class="bi bi-person-plus-fill me-1"></i>Neu
+                    </a>
+                </div>
+
+                <!-- Zugewiesene Mitarbeiter -->
+                <div th:if="${#lists.isEmpty(mitarbeiter)}" class="empty-state py-4">
+                    <i class="bi bi-people text-muted" style="font-size:2rem"></i>
+                    <p class="text-muted mt-2 mb-0">Noch keine Mitarbeiter in diesem Team</p>
+                </div>
+
+                <ul th:unless="${#lists.isEmpty(mitarbeiter)}" class="list-group list-group-flush">
+                    <li th:each="ma : ${mitarbeiter}" class="list-group-item px-3 py-2">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="avatar-sm flex-shrink-0"
+                                 th:style="'background-color:' + ${team.farbe}"
+                                 th:text="${ma.initialen}"></div>
+                            <div class="flex-grow-1">
+                                <div class="fw-medium">
+                                    <a th:href="@{/mitarbeiter/{id}(id=${ma.id})}"
+                                       th:text="${ma.vollstaendigerName}"
+                                       class="text-decoration-none text-dark"></a>
+                                </div>
+                                <small class="text-muted" th:text="${ma.rolle ?: '—'}"></small>
+                            </div>
+                            <!-- Entfernen-Button -->
+                            <form th:action="@{/teams/{tid}/mitarbeiter/{mid}/entfernen(tid=${team.id},mid=${ma.id})}"
+                                  method="post" class="flex-shrink-0">
+                                <button type="submit"
+                                        class="btn btn-xs btn-outline-danger"
+                                        title="Aus Team entfernen"
+                                        onclick="return confirm('Mitarbeiter aus dem Team entfernen?')">
+                                    <i class="bi bi-person-dash"></i>
+                                </button>
+                            </form>
+                        </div>
+                    </li>
+                </ul>
+
+                <!-- Mitarbeiter zuweisen -->
+                <div th:if="${!#lists.isEmpty(verfuegbareMitarbeiter)}"
+                     class="card-footer-custom border-top">
+                    <form th:action="@{/teams/{id}/mitarbeiter/zuweisen(id=${team.id})}"
+                          method="post" class="d-flex gap-2">
+                        <select name="mitarbeiterId" class="form-select form-select-sm">
+                            <option value="" disabled selected>Mitarbeiter auswählen…</option>
+                            <optgroup th:each="ma : ${verfuegbareMitarbeiter}"
+                                      th:if="${ma.team == null}"
+                                      label="Ohne Team">
+                            </optgroup>
+                            <th:block th:each="ma : ${verfuegbareMitarbeiter}">
+                                <option th:value="${ma.id}"
+                                        th:text="${ma.vollstaendigerName} + (${ma.team != null} ? ' (aktuell: ' + ${ma.team.name} + ')' : ' (kein Team)')">
+                                </option>
+                            </th:block>
+                        </select>
+                        <button type="submit" class="btn btn-sm btn-primary text-nowrap">
+                            <i class="bi bi-person-check-fill me-1"></i>Zuweisen
+                        </button>
+                    </form>
+                </div>
+
+                <div th:if="${#lists.isEmpty(verfuegbareMitarbeiter)}"
+                     class="card-footer-custom text-muted small text-center py-2">
+                    <i class="bi bi-check-circle me-1 text-success"></i>
+                    Alle Mitarbeiter sind diesem Team zugewiesen
+                </div>
+            </div>
+        </div>
+
+        <!-- Projekte -->
+        <div class="col-lg-6">
+            <div class="card card-custom">
+                <div class="card-header-custom d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">
+                        <i class="bi bi-folder2-open me-2"></i>Projekte
+                        <span th:if="${!#lists.isEmpty(projekte)}"
+                              class="badge rounded-pill bg-primary-soft text-primary ms-1"
+                              th:text="${#lists.size(projekte)}"></span>
+                    </h5>
+                    <a th:href="@{/projekte/neu}" class="btn btn-sm btn-outline-primary">
+                        <i class="bi bi-plus-lg"></i>
+                    </a>
+                </div>
+                <div th:if="${#lists.isEmpty(projekte)}" class="empty-state py-4">
+                    <i class="bi bi-folder text-muted" style="font-size:2rem"></i>
+                    <p class="text-muted mt-2 mb-0">Keine Projekte in diesem Team</p>
+                </div>
+                <ul th:unless="${#lists.isEmpty(projekte)}" class="list-group list-group-flush">
+                    <li th:each="projekt : ${projekte}" class="list-group-item px-3 py-2">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <a th:href="@{/projekte/{id}(id=${projekt.id})}"
+                               th:text="${projekt.name}"
+                               class="text-decoration-none text-dark fw-medium"></a>
+                            <span th:class="'badge rounded-pill bg-' + ${projekt.status.bootstrapKlasse}"
+                                  th:text="${projekt.status.bezeichnung}"></span>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+    </div>
+</main>
+</body>
+</html>

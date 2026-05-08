@@ -1,0 +1,28 @@
+# Compiled classes
+*.class
+
+# Maven
+target/
+
+# IDE
+.idea/
+*.iml
+.vscode/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Application data
+data/
+
+# Logs
+*.log
+logs/
+
+# Spring Boot DevTools restart file
+.spring-boot-devtools.properties

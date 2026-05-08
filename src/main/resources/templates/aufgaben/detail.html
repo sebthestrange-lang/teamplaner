@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}"
+      lang="de">
+<head><title th:text="${aufgabe.titel}">Aufgabe</title></head>
+<body>
+<main layout:fragment="content">
+
+    <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a th:href="@{/aufgaben}">Aufgaben</a></li>
+            <li class="breadcrumb-item active" th:text="${aufgabe.titel}"></li>
+        </ol>
+    </nav>
+
+    <div class="page-header mb-4 d-flex justify-content-between align-items-start">
+        <div>
+            <div class="d-flex align-items-center gap-2 mb-1">
+                <h1 class="page-title mb-0" th:text="${aufgabe.titel}"></h1>
+                <span th:class="'badge rounded-pill bg-' + ${aufgabe.prioritaet.bootstrapKlasse}"
+                      th:text="${aufgabe.prioritaet.bezeichnung}"></span>
+                <span th:class="'badge rounded-pill bg-' + ${aufgabe.status.bootstrapKlasse}"
+                      th:text="${aufgabe.status.bezeichnung}"></span>
+            </div>
+            <p th:if="${aufgabe.beschreibung}" class="text-muted" th:text="${aufgabe.beschreibung}"></p>
+        </div>
+        <div class="d-flex gap-2">
+            <a th:href="@{/aufgaben/{id}/bearbeiten(id=${aufgabe.id})}" class="btn btn-outline-primary">
+                <i class="bi bi-pencil me-1"></i>Bearbeiten
+            </a>
+            <button type="button" class="btn btn-outline-danger"
+                    th:onclick="'loeschenBestaetigen(\'/aufgaben/' + ${aufgabe.id} + '/loeschen\')'">
+                <i class="bi bi-trash"></i>
+            </button>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-lg-4">
+            <div class="card card-custom">
+                <div class="card-header-custom">
+                    <h5 class="mb-0"><i class="bi bi-info-circle me-2"></i>Details</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <small class="text-muted d-block">Projekt</small>
+                        <span th:if="${aufgabe.projekt}">
+                            <a th:href="@{/projekte/{id}(id=${aufgabe.projekt.id})}"
+                               th:text="${aufgabe.projekt.name}"
+                               class="text-decoration-none"></a>
+                        </span>
+                        <span th:unless="${aufgabe.projekt}" class="text-muted">—</span>
+                    </div>
+                    <div class="mb-3">
+                        <small class="text-muted d-block">Mitarbeiter</small>
+                        <span th:if="${aufgabe.mitarbeiter}">
+                            <a th:href="@{/mitarbeiter/{id}(id=${aufgabe.mitarbeiter.id})}"
+                               th:text="${aufgabe.mitarbeiter.vollstaendigerName}"
+                               class="text-decoration-none"></a>
+                        </span>
+                        <span th:unless="${aufgabe.mitarbeiter}" class="text-muted">—</span>
+                    </div>
+                    <div class="mb-3">
+                        <small class="text-muted d-block">Fällig am</small>
+                        <span th:if="${aufgabe.faelligAm}"
+                              th:text="${#temporals.format(aufgabe.faelligAm, 'dd.MM.yyyy')}"></span>
+                        <span th:unless="${aufgabe.faelligAm}" class="text-muted">—</span>
+                    </div>
+                    <div class="mb-3">
+                        <small class="text-muted d-block">Erstellt am</small>
+                        <span th:text="${#temporals.format(aufgabe.erstelltAm, 'dd.MM.yyyy HH:mm')}"></span>
+                    </div>
+                    <div th:if="${aufgabe.abgeschlossenAm}">
+                        <small class="text-muted d-block">Abgeschlossen am</small>
+                        <span th:text="${#temporals.format(aufgabe.abgeschlossenAm, 'dd.MM.yyyy HH:mm')}"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-8">
+            <div class="card card-custom">
+                <div class="card-header-custom">
+                    <h5 class="mb-0"><i class="bi bi-arrow-repeat me-2"></i>Status ändern</h5>
+                </div>
+                <div class="card-body">
+                    <form th:action="@{/aufgaben/{id}/status(id=${aufgabe.id})}" method="post"
+                          class="d-flex gap-2 flex-wrap">
+                        <button type="submit" name="status" value="OFFEN"
+                                th:class="'btn btn-sm ' + (${aufgabe.status.name() == 'OFFEN'} ? 'btn-secondary' : 'btn-outline-secondary')">
+                            Offen
+                        </button>
+                        <button type="submit" name="status" value="IN_BEARBEITUNG"
+                                th:class="'btn btn-sm ' + (${aufgabe.status.name() == 'IN_BEARBEITUNG'} ? 'btn-primary' : 'btn-outline-primary')">
+                            In Bearbeitung
+                        </button>
+                        <button type="submit" name="status" value="ABGESCHLOSSEN"
+                                th:class="'btn btn-sm ' + (${aufgabe.status.name() == 'ABGESCHLOSSEN'} ? 'btn-success' : 'btn-outline-success')">
+                            Abgeschlossen
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</main>
+</body>
+</html>

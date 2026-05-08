@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}"
+      lang="de">
+<head><title th:text="${aktion}">Mitarbeiter</title></head>
+<body>
+<main layout:fragment="content">
+
+    <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a th:href="@{/mitarbeiter}">Mitarbeiter</a></li>
+            <li class="breadcrumb-item active" th:text="${aktion}"></li>
+        </ol>
+    </nav>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-7">
+            <div class="card card-custom">
+                <div class="card-header-custom">
+                    <h5 class="mb-0" th:text="${aktion}"></h5>
+                </div>
+                <div class="card-body">
+                    <form th:action="${mitarbeiter.id != null} ? @{/mitarbeiter/{id}(id=${mitarbeiter.id})} : @{/mitarbeiter}"
+                          th:object="${mitarbeiter}" method="post">
+
+                        <div class="row g-3 mb-3">
+                            <div class="col-sm-6">
+                                <label for="vorname" class="form-label">Vorname <span class="text-danger">*</span></label>
+                                <input type="text" id="vorname" th:field="*{vorname}"
+                                       th:class="'form-control' + (${#fields.hasErrors('vorname')} ? ' is-invalid' : '')"
+                                       placeholder="Max">
+                                <div th:if="${#fields.hasErrors('vorname')}" class="invalid-feedback"
+                                     th:errors="*{vorname}"></div>
+                            </div>
+                            <div class="col-sm-6">
+                                <label for="nachname" class="form-label">Nachname <span class="text-danger">*</span></label>
+                                <input type="text" id="nachname" th:field="*{nachname}"
+                                       th:class="'form-control' + (${#fields.hasErrors('nachname')} ? ' is-invalid' : '')"
+                                       placeholder="Mustermann">
+                                <div th:if="${#fields.hasErrors('nachname')}" class="invalid-feedback"
+                                     th:errors="*{nachname}"></div>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="rolle" class="form-label">Rolle</label>
+                            <input type="text" id="rolle" th:field="*{rolle}"
+                                   class="form-control" placeholder="z.B. Senior Developer">
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="team" class="form-label">Team</label>
+                            <select id="team" th:field="*{team}" class="form-select">
+                                <option value="">Kein Team</option>
+                                <option th:each="t : ${teams}" th:value="${t.id}"
+                                        th:text="${t.name}"></option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="email" class="form-label">E-Mail</label>
+                            <input type="email" id="email" th:field="*{email}"
+                                   th:class="'form-control' + (${#fields.hasErrors('email')} ? ' is-invalid' : '')"
+                                   placeholder="max@example.com">
+                            <div th:if="${#fields.hasErrors('email')}" class="invalid-feedback"
+                                 th:errors="*{email}"></div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="telefon" class="form-label">Telefon</label>
+                            <input type="tel" id="telefon" th:field="*{telefon}"
+                                   class="form-control" placeholder="+49 ...">
+                        </div>
+
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-check-lg me-1"></i>Speichern
+                            </button>
+                            <a th:href="@{/mitarbeiter}" class="btn btn-light">Abbrechen</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</main>
+</body>
+</html>

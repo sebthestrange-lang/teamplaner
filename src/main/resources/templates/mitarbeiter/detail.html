@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}"
+      lang="de">
+<head><title th:text="${mitarbeiter.vollstaendigerName}">Mitarbeiter</title></head>
+<body>
+<main layout:fragment="content">
+
+    <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a th:href="@{/mitarbeiter}">Mitarbeiter</a></li>
+            <li class="breadcrumb-item active" th:text="${mitarbeiter.vollstaendigerName}"></li>
+        </ol>
+    </nav>
+
+    <div class="page-header mb-4 d-flex justify-content-between align-items-start">
+        <div class="d-flex align-items-center gap-3">
+            <div class="avatar-lg"
+                 th:style="'background-color:' + ${mitarbeiter.team?.farbe ?: '#6366f1'}"
+                 th:text="${mitarbeiter.initialen}"></div>
+            <div>
+                <h1 class="page-title mb-0" th:text="${mitarbeiter.vollstaendigerName}"></h1>
+                <span class="text-muted" th:text="${mitarbeiter.rolle ?: '—'}"></span>
+                <div th:if="${mitarbeiter.team}" class="mt-1">
+                    <a th:href="@{/teams/{id}(id=${mitarbeiter.team.id})}"
+                       class="badge rounded-pill text-decoration-none"
+                       th:style="'background-color:' + ${mitarbeiter.team.farbe} + '22; color:' + ${mitarbeiter.team.farbe}"
+                       th:text="${mitarbeiter.team.name}"></a>
+                </div>
+            </div>
+        </div>
+        <div class="d-flex gap-2">
+            <a th:href="@{/mitarbeiter/{id}/bearbeiten(id=${mitarbeiter.id})}" class="btn btn-outline-primary">
+                <i class="bi bi-pencil me-1"></i>Bearbeiten
+            </a>
+            <button type="button" class="btn btn-outline-danger"
+                    th:onclick="'loeschenBestaetigen(\'/mitarbeiter/' + ${mitarbeiter.id} + '/loeschen\')'">
+                <i class="bi bi-trash me-1"></i>Löschen
+            </button>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <!-- Kontakt -->
+        <div class="col-lg-4">
+            <div class="card card-custom">
+                <div class="card-header-custom">
+                    <h5 class="mb-0"><i class="bi bi-info-circle me-2"></i>Kontakt</h5>
+                </div>
+                <div class="card-body">
+                    <div th:if="${mitarbeiter.email}" class="mb-2">
+                        <small class="text-muted d-block">E-Mail</small>
+                        <a th:href="'mailto:' + ${mitarbeiter.email}"
+                           th:text="${mitarbeiter.email}"
+                           class="text-decoration-none"></a>
+                    </div>
+                    <div th:if="${mitarbeiter.telefon}" class="mb-2">
+                        <small class="text-muted d-block">Telefon</small>
+                        <span th:text="${mitarbeiter.telefon}"></span>
+                    </div>
+                    <div>
+                        <small class="text-muted d-block">Dabei seit</small>
+                        <span th:text="${#temporals.format(mitarbeiter.erstelltAm, 'dd.MM.yyyy')}"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Aufgaben -->
+        <div class="col-lg-8">
+            <div class="card card-custom">
+                <div class="card-header-custom d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="bi bi-check2-square me-2"></i>Aufgaben</h5>
+                    <a th:href="@{/aufgaben(mitarbeiterId=${mitarbeiter.id})}"
+                       class="btn btn-sm btn-outline-primary">Alle anzeigen</a>
+                </div>
+                <div th:if="${#lists.isEmpty(aufgaben)}" class="empty-state py-4">
+                    <p class="text-muted mb-0">Keine Aufgaben zugewiesen</p>
+                </div>
+                <div th:unless="${#lists.isEmpty(aufgaben)}" class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead>
+                        <tr>
+                            <th>Aufgabe</th>
+                            <th>Priorität</th>
+                            <th>Status</th>
+                            <th>Fällig</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="aufgabe : ${aufgaben}"
+                            th:class="${aufgabe.faelligAm != null and aufgabe.faelligAm.isBefore(#temporals.createToday()) and aufgabe.status.name() != 'ABGESCHLOSSEN'} ? 'table-danger' : ''">
+                            <td>
+                                <a th:href="@{/aufgaben/{id}(id=${aufgabe.id})}"
+                                   th:text="${aufgabe.titel}"
+                                   class="text-decoration-none text-dark fw-medium"></a>
+                            </td>
+                            <td>
+                                <span th:class="'badge rounded-pill bg-' + ${aufgabe.prioritaet.bootstrapKlasse}"
+                                      th:text="${aufgabe.prioritaet.bezeichnung}"></span>
+                            </td>
+                            <td>
+                                <span th:class="'badge rounded-pill bg-' + ${aufgabe.status.bootstrapKlasse}"
+                                      th:text="${aufgabe.status.bezeichnung}"></span>
+                            </td>
+                            <td th:text="${aufgabe.faelligAm != null ? #temporals.format(aufgabe.faelligAm, 'dd.MM.yyyy') : '—'}"></td>
+                        </tr>
+                    </tbody>
+                </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</main>
+</body>
+</html>

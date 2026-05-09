@@ -1,0 +1,22 @@
+{
+  "permissions": {
+    "allow": [
+      "PowerShell(Get-Content *)",
+      "PowerShell(mvn compile *)",
+      "PowerShell(try { $r = Invoke-WebRequest -Uri \"http://localhost:8080/aufgaben/export\" -UseBasicParsing -TimeoutSec 5; Write-Host \"Export Status: $\\($r.StatusCode\\), Content-Type: $\\($r.Headers['Content-Type']\\), Bytes: $\\($r.RawContentLength\\)\" } catch { Write-Host \"FEHLER: $_\" })",
+      "PowerShell(try { $r = Invoke-WebRequest -Uri \"http://localhost:8080/teams/1\" -UseBasicParsing -TimeoutSec 5; \"Status: $\\($r.StatusCode\\); Length: $\\($r.Content.Length\\)\" } catch { \"Error: $_\" })",
+      "PowerShell(Get-NetTCPConnection *)",
+      "Bash(mvn spring-boot:run -Dspring-boot.run.jvmArguments=\"-Dspring.profiles.active=dev\")",
+      "Bash(curl -s http://localhost:8080/mitarbeiter)",
+      "Bash(curl -v http://localhost:8080/mitarbeiter)",
+      "Bash(pkill -f \"spring-boot:run\")",
+      "Bash(mvn spring-boot:run -q)",
+      "Bash(netstat -ano)",
+      "Bash(awk '{print $5}')",
+      "Bash(xargs -I{} taskkill /F /PID {})",
+      "Bash(cmd.exe /c \"for /f \\\\\"tokens=5\\\\\" %a in \\('netstat -aon ^| findstr :8080 ^| findstr LISTENING'\\) do taskkill /F /PID %a\")",
+      "Bash(cmd.exe /c \"netstat -ano | findstr :8080 | findstr LISTENING\")",
+      "Bash(awk '/Exception processing template \"error\\\\/500\"/{found=1} !found' /tmp/app8083.log)"
+    ]
+  }
+}

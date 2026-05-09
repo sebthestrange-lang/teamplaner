@@ -12,19 +12,18 @@ public class TodoSpecification {
     private TodoSpecification() {}
 
     public static Specification<Todo> withFilter(TodoFilterDTO filter) {
-        return Specification
-                .where(hatPrioritaet(filter.getPrioritaet()))
+        return hatPrioritaet(filter.getPrioritaet())
                 .and(hatStatus(filter.getStatus()))
                 .and(enthältSuchtext(filter.getSuche()));
     }
 
     private static Specification<Todo> hatPrioritaet(de.teamplanner.model.enums.TodoPrioritaet prioritaet) {
-        if (prioritaet == null) return null;
+        if (prioritaet == null) return Specification.unrestricted();
         return (root, query, cb) -> cb.equal(root.get("prioritaet"), prioritaet);
     }
 
     private static Specification<Todo> hatStatus(String status) {
-        if (!StringUtils.hasText(status)) return null;
+        if (!StringUtils.hasText(status)) return Specification.unrestricted();
         return switch (status) {
             case "offen" -> (root, query, cb) -> cb.equal(root.get("erledigt"), false);
             case "erledigt" -> (root, query, cb) -> cb.equal(root.get("erledigt"), true);
@@ -36,12 +35,12 @@ public class TodoSpecification {
                     cb.equal(root.get("faelligAm"), LocalDate.now()),
                     cb.equal(root.get("erledigt"), false)
             );
-            default -> null;
+            default -> Specification.unrestricted();
         };
     }
 
     private static Specification<Todo> enthältSuchtext(String suche) {
-        if (!StringUtils.hasText(suche)) return null;
+        if (!StringUtils.hasText(suche)) return Specification.unrestricted();
         String muster = "%" + suche.toLowerCase() + "%";
         return (root, query, cb) ->
                 cb.like(cb.lower(root.get("titel")), muster);

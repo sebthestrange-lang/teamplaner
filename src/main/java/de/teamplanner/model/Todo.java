@@ -1,7 +1,7 @@
 package de.teamplanner.model;
 
-import de.teamplanner.model.enums.TodoPrioritaet;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
@@ -32,9 +32,9 @@ public class Todo {
     private String beschreibung;
 
     @NotNull(message = "Priorität muss angegeben werden")
-    @Enumerated(EnumType.STRING)
+    @Min(value = 1, message = "Priorität muss mindestens 1 sein")
     @Column(nullable = false)
-    private TodoPrioritaet prioritaet;
+    private Integer prioritaet;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "organisation_id", nullable = false)

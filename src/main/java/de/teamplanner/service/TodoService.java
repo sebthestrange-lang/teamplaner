@@ -9,6 +9,7 @@ import de.teamplanner.specification.TodoSpecification;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -37,15 +38,17 @@ public class TodoService {
         return todoRepository.findAll(byOrg());
     }
 
+    private static final Sort STANDARD_SORT =
+            Sort.by("prioritaet").ascending().and(Sort.by("faelligAm").ascending());
+
     public List<Todo> mitFilter(TodoFilterDTO filter) {
-        return todoRepository.findAll(byOrg().and(TodoSpecification.withFilter(filter)));
+        return todoRepository.findAll(byOrg().and(TodoSpecification.withFilter(filter)), STANDARD_SORT);
     }
 
     public List<Todo> alleOffen() {
         Specification<Todo> spec = byOrg().and(
                 (root, query, cb) -> cb.isFalse(root.get("erledigt")));
-        return todoRepository.findAll(spec,
-                org.springframework.data.domain.Sort.by("faelligAm").ascending()).stream().toList();
+        return todoRepository.findAll(spec, STANDARD_SORT).stream().toList();
     }
 
     public List<Todo> alleErledigt() {

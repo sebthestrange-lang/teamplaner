@@ -12,14 +12,8 @@ public class TodoSpecification {
     private TodoSpecification() {}
 
     public static Specification<Todo> withFilter(TodoFilterDTO filter) {
-        return hatPrioritaet(filter.getPrioritaet())
-                .and(hatStatus(filter.getStatus()))
+        return hatStatus(filter.getStatus())
                 .and(enthältSuchtext(filter.getSuche()));
-    }
-
-    private static Specification<Todo> hatPrioritaet(de.teamplanner.model.enums.TodoPrioritaet prioritaet) {
-        if (prioritaet == null) return Specification.unrestricted();
-        return (root, query, cb) -> cb.equal(root.get("prioritaet"), prioritaet);
     }
 
     private static Specification<Todo> hatStatus(String status) {

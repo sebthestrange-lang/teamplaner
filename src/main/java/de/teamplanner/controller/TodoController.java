@@ -2,7 +2,6 @@ package de.teamplanner.controller;
 
 import de.teamplanner.dto.TodoFilterDTO;
 import de.teamplanner.model.Todo;
-import de.teamplanner.model.enums.TodoPrioritaet;
 import de.teamplanner.service.TodoService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -22,7 +21,6 @@ public class TodoController {
     @GetMapping
     public String liste(@ModelAttribute TodoFilterDTO filter, Model model) {
         model.addAttribute("todos", todoService.mitFilter(filter));
-        model.addAttribute("prioritaeten", TodoPrioritaet.values());
         model.addAttribute("filter", filter);
         model.addAttribute("schnellTodo", new Todo());
         return "todos/liste";
@@ -30,10 +28,7 @@ public class TodoController {
 
     @GetMapping("/neu")
     public String neuFormular(Model model) {
-        Todo todo = new Todo();
-        todo.setPrioritaet(TodoPrioritaet.MITTEL);
-        model.addAttribute("todo", todo);
-        model.addAttribute("prioritaeten", TodoPrioritaet.values());
+        model.addAttribute("todo", new Todo());
         model.addAttribute("aktion", "Neues Todo");
         return "todos/formular";
     }
@@ -45,7 +40,6 @@ public class TodoController {
                             RedirectAttributes redirectAttributes) {
         if (result.hasErrors()) {
             model.addAttribute("todos", todoService.mitFilter(new TodoFilterDTO()));
-            model.addAttribute("prioritaeten", TodoPrioritaet.values());
             model.addAttribute("filter", new TodoFilterDTO());
             return "todos/liste";
         }
@@ -57,7 +51,6 @@ public class TodoController {
     @GetMapping("/{id}/bearbeiten")
     public String bearbeitenFormular(@PathVariable Long id, Model model) {
         model.addAttribute("todo", todoService.findByIdOrThrow(id));
-        model.addAttribute("prioritaeten", TodoPrioritaet.values());
         model.addAttribute("aktion", "Todo bearbeiten");
         return "todos/formular";
     }
@@ -69,7 +62,6 @@ public class TodoController {
                                 Model model,
                                 RedirectAttributes redirectAttributes) {
         if (result.hasErrors()) {
-            model.addAttribute("prioritaeten", TodoPrioritaet.values());
             model.addAttribute("aktion", "Todo bearbeiten");
             return "todos/formular";
         }

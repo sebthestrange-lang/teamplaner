@@ -43,11 +43,12 @@
                         <div class="row g-3 mb-4">
                             <div class="col-sm-6">
                                 <label for="prioritaet" class="form-label">Priorität <span class="text-danger">*</span></label>
-                                <select id="prioritaet" th:field="*{prioritaet}"
-                                        th:class="'form-select' + (${#fields.hasErrors('prioritaet')} ? ' is-invalid' : '')">
-                                    <option th:each="p : ${prioritaeten}" th:value="${p.name()}"
-                                            th:text="${p.bezeichnung}"></option>
-                                </select>
+                                <input type="number" id="prioritaet" th:field="*{prioritaet}"
+                                       th:class="'form-control' + (${#fields.hasErrors('prioritaet')} ? ' is-invalid' : '')"
+                                       placeholder="z. B. 1" min="1">
+                                <div class="form-text">Kleinere Zahl = höhere Priorität</div>
+                                <div th:if="${#fields.hasErrors('prioritaet')}" class="invalid-feedback"
+                                     th:errors="*{prioritaet}"></div>
                             </div>
                             <div class="col-sm-6">
                                 <label for="faelligAm" class="form-label">Fällig am</label>

@@ -31,7 +31,12 @@
       "Bash(cd /d \"E:\\\\develop\\\\workspace\\\\teamplanner\")",
       "Bash(ren \"src\\\\main\\\\java\\\\de\\\\teamplanner\" \"teamplaner\")",
       "Bash(cmd.exe /c \"ren \\\\\"E:\\\\\\\\develop\\\\\\\\workspace\\\\\\\\teamplanner\\\\\\\\src\\\\\\\\main\\\\\\\\java\\\\\\\\de\\\\\\\\teamplanner\\\\\" teamplaner\")",
-      "Bash(cmd.exe /c \"ren \\\\\"E:\\\\\\\\develop\\\\\\\\workspace\\\\\\\\teamplanner\\\\\\\\src\\\\\\\\main\\\\\\\\java\\\\\\\\de\\\\\\\\teamplaner\\\\\\\\TeamplannerApplication.java\\\\\" TeamPlanerApplication.java\")"
+      "Bash(cmd.exe /c \"ren \\\\\"E:\\\\\\\\develop\\\\\\\\workspace\\\\\\\\teamplanner\\\\\\\\src\\\\\\\\main\\\\\\\\java\\\\\\\\de\\\\\\\\teamplaner\\\\\\\\TeamplannerApplication.java\\\\\" TeamPlanerApplication.java\")",
+      "PowerShell(mvn spring-boot:run *)",
+      "Bash(curl -s -b /tmp/cookies.txt http://localhost:8080/aufgaben)",
+      "Bash(rm -f /tmp/c3.txt)",
+      "Bash(curl -s -c /tmp/c3.txt http://localhost:8080/login -o /tmp/lp2.html)",
+      "Read(//tmp/**)"
     ]
   }
 }

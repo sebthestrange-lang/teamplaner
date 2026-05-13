@@ -8,6 +8,7 @@ import de.teamplaner.model.Aufgabe;
 import de.teamplaner.model.Mitarbeiter;
 import de.teamplaner.model.Team;
 import de.teamplaner.model.enums.AufgabenStatus;
+import de.teamplaner.model.enums.Prioritaet;
 import de.teamplaner.repository.AufgabeRepository;
 import de.teamplaner.specification.AufgabeSpecification;
 import lombok.RequiredArgsConstructor;
@@ -92,6 +93,18 @@ public class AufgabeService {
         }
         Aufgabe gespeichert = aufgabeRepository.save(aufgabe);
         auditService.log("Aufgabe", aufgabe.getId(), "UPDATE");
+        return gespeichert;
+    }
+
+    @Transactional
+    public Aufgabe schnellAnlegen(String titel) {
+        Aufgabe aufgabe = new Aufgabe();
+        aufgabe.setTitel(titel.trim());
+        aufgabe.setStatus(AufgabenStatus.OFFEN);
+        aufgabe.setPrioritaet(Prioritaet.MITTEL);
+        aufgabe.setOrganisation(orgContext.getOrganisation());
+        Aufgabe gespeichert = aufgabeRepository.save(aufgabe);
+        auditService.log("Aufgabe", gespeichert.getId(), "CREATE");
         return gespeichert;
     }
 

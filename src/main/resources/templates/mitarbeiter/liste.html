@@ -23,7 +23,7 @@
             <form th:action="@{/mitarbeiter}" method="get" class="row g-2 align-items-end">
                 <div class="col-sm-6 col-md-4">
                     <label class="form-label small text-muted mb-1">Team</label>
-                    <select name="teamId" class="form-select form-select-sm">
+                    <select name="teamId" class="form-select form-select-sm" onchange="this.form.submit()">
                         <option value="">Alle Teams</option>
                         <option th:each="team : ${teams}" th:value="${team.id}" th:text="${team.name}"
                                 th:selected="${filter.teamId == team.id}"></option>

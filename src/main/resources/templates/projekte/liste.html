@@ -23,7 +23,7 @@
             <form th:action="@{/projekte}" method="get" class="row g-2 align-items-end">
                 <div class="col-sm-6 col-md-3">
                     <label class="form-label small text-muted mb-1">Team</label>
-                    <select name="teamId" class="form-select form-select-sm">
+                    <select name="teamId" class="form-select form-select-sm" onchange="this.form.submit()">
                         <option value="">Alle Teams</option>
                         <option th:each="team : ${teams}" th:value="${team.id}" th:text="${team.name}"
                                 th:selected="${filter.teamId == team.id}"></option>
@@ -31,7 +31,7 @@
                 </div>
                 <div class="col-sm-6 col-md-3">
                     <label class="form-label small text-muted mb-1">Status</label>
-                    <select name="status" class="form-select form-select-sm">
+                    <select name="status" class="form-select form-select-sm" onchange="this.form.submit()">
                         <option value="">Alle Status</option>
                         <option th:each="s : ${projektStatus}" th:value="${s.name()}" th:text="${s.bezeichnung}"
                                 th:selected="${filter.status == s}"></option>

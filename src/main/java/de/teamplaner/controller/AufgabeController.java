@@ -8,6 +8,7 @@ import de.teamplaner.service.AufgabeService;
 import de.teamplaner.service.MitarbeiterService;
 import de.teamplaner.service.ProjektService;
 import de.teamplaner.service.TeamService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -124,10 +125,18 @@ public class AufgabeController {
     @PostMapping("/{id}/status")
     public String statusAendern(@PathVariable Long id,
                                 @RequestParam AufgabenStatus status,
-                                RedirectAttributes redirectAttributes) {
+                                HttpServletRequest request) {
         aufgabeService.statusAendern(id, status);
-        redirectAttributes.addFlashAttribute("erfolgsMeldung", "Status wurde aktualisiert.");
-        return "redirect:/aufgaben/" + id;
+        String referer = request.getHeader("Referer");
+        return "redirect:" + (referer != null ? referer : "/aufgaben");
+    }
+
+    @PostMapping("/schnell")
+    public String schnellAnlegen(@RequestParam String titel) {
+        if (titel != null && !titel.isBlank()) {
+            aufgabeService.schnellAnlegen(titel);
+        }
+        return "redirect:/aufgaben";
     }
 
     @PostMapping("/{id}/loeschen")

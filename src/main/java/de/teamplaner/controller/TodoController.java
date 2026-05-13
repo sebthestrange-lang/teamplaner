@@ -2,6 +2,7 @@ package de.teamplaner.controller;
 
 import de.teamplaner.dto.TodoFilterDTO;
 import de.teamplaner.model.Todo;
+import de.teamplaner.model.enums.TodoWiederholung;
 import de.teamplaner.service.TodoService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -30,6 +31,7 @@ public class TodoController {
     public String neuFormular(Model model) {
         model.addAttribute("todo", new Todo());
         model.addAttribute("aktion", "Neues Todo");
+        model.addAttribute("wiederholungen", TodoWiederholung.values());
         return "todos/formular";
     }
 
@@ -52,6 +54,7 @@ public class TodoController {
     public String bearbeitenFormular(@PathVariable Long id, Model model) {
         model.addAttribute("todo", todoService.findByIdOrThrow(id));
         model.addAttribute("aktion", "Todo bearbeiten");
+        model.addAttribute("wiederholungen", TodoWiederholung.values());
         return "todos/formular";
     }
 
@@ -63,6 +66,7 @@ public class TodoController {
                                 RedirectAttributes redirectAttributes) {
         if (result.hasErrors()) {
             model.addAttribute("aktion", "Todo bearbeiten");
+            model.addAttribute("wiederholungen", TodoWiederholung.values());
             return "todos/formular";
         }
         Todo todo = todoService.findByIdOrThrow(id);
@@ -70,6 +74,7 @@ public class TodoController {
         todo.setBeschreibung(formDaten.getBeschreibung());
         todo.setPrioritaet(formDaten.getPrioritaet());
         todo.setFaelligAm(formDaten.getFaelligAm());
+        todo.setWiederholung(formDaten.getWiederholung() != null ? formDaten.getWiederholung() : TodoWiederholung.KEINE);
         todoService.speichern(todo);
         redirectAttributes.addFlashAttribute("erfolgsMeldung", "Todo wurde aktualisiert.");
         return "redirect:/todos";

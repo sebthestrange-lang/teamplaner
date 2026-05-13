@@ -185,6 +185,15 @@ body {
     gap: 1rem;
 }
 
+.stat-card-link {
+    transition: box-shadow 0.15s, transform 0.15s;
+    cursor: pointer;
+}
+.stat-card-link:hover {
+    box-shadow: var(--card-shadow-hover);
+    transform: translateY(-2px);
+}
+
 .stat-icon {
     width: 48px;
     height: 48px;
@@ -525,4 +534,87 @@ body {
 }
 .filter-btn-scroll .btn-group {
     white-space: nowrap;
+}
+
+/* ===========================
+   Sidebar Suche
+   =========================== */
+.sidebar-search-input {
+    background-color: rgba(255,255,255,.08);
+    border-color: rgba(255,255,255,.12);
+    color: #cbd5e1;
+    font-size: 0.8rem;
+}
+.sidebar-search-input::placeholder { color: #64748b; }
+.sidebar-search-input:focus {
+    background-color: rgba(255,255,255,.12);
+    border-color: var(--primary);
+    color: white;
+    box-shadow: none;
+}
+.sidebar-search-btn {
+    background-color: rgba(255,255,255,.08);
+    border-color: rgba(255,255,255,.12);
+    color: #94a3b8;
+}
+.sidebar-search-btn:hover {
+    background-color: rgba(255,255,255,.15);
+    color: white;
+}
+
+/* ===========================
+   Kanban Board
+   =========================== */
+.kanban-board {
+    padding-bottom: 1rem;
+}
+
+.kanban-column {
+    display: flex;
+    flex-direction: column;
+}
+
+.kanban-col-header {
+    background-color: #f1f5f9;
+    border-radius: 8px;
+    font-size: 0.875rem;
+}
+
+.kanban-col-body {
+    flex: 1;
+    background-color: #f8fafc;
+    border-radius: 8px;
+    padding: 0.5rem;
+    min-height: 200px;
+}
+
+.kanban-card {
+    cursor: grab;
+    border-radius: 8px;
+    box-shadow: var(--card-shadow);
+    transition: box-shadow 0.15s, transform 0.15s;
+    user-select: none;
+}
+.kanban-card:hover {
+    box-shadow: var(--card-shadow-hover);
+    transform: translateY(-1px);
+}
+.kanban-card:active { cursor: grabbing; }
+
+.kanban-ghost {
+    opacity: 0.4;
+    background: #e0e7ff;
+}
+.kanban-chosen {
+    box-shadow: 0 8px 24px rgba(0,0,0,.18) !important;
+    transform: rotate(1deg);
+}
+
+.kanban-empty {
+    border: 2px dashed #e2e8f0;
+    border-radius: 8px;
+    min-height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }

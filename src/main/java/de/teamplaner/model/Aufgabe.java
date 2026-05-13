@@ -10,6 +10,8 @@ import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Table(name = "aufgaben")
@@ -63,4 +65,26 @@ public class Aufgabe {
 
     @Column(name = "abgeschlossen_am")
     private LocalDateTime abgeschlossenAm;
+
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+        name = "aufgabe_tags",
+        joinColumns = @JoinColumn(name = "aufgabe_id"),
+        inverseJoinColumns = @JoinColumn(name = "tag_id")
+    )
+    @Builder.Default
+    private Set<Tag> tags = new HashSet<>();
+
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+        name = "aufgabe_abhaengigkeiten",
+        joinColumns = @JoinColumn(name = "aufgabe_id"),
+        inverseJoinColumns = @JoinColumn(name = "blockiert_von_id")
+    )
+    @Builder.Default
+    private Set<Aufgabe> blockiertVon = new HashSet<>();
+
+    public boolean hatOffeneBlocker() {
+        return blockiertVon.stream().anyMatch(a -> a.getStatus() != AufgabenStatus.ABGESCHLOSSEN);
+    }
 }

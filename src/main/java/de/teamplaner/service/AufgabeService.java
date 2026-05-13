@@ -23,7 +23,9 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -46,6 +48,54 @@ public class AufgabeService {
 
     public List<Aufgabe> mitFilter(AufgabeFilterDTO filter) {
         return aufgabeRepository.findAll(byOrg().and(AufgabeSpecification.withFilter(filter)));
+    }
+
+    public Map<AufgabenStatus, List<Aufgabe>> boardView(AufgabeFilterDTO filter) {
+        List<Aufgabe> alle = aufgabeRepository.findAll(
+                byOrg().and(AufgabeSpecification.withFilterIgnoreStatus(filter)));
+        return alle.stream().collect(Collectors.groupingBy(Aufgabe::getStatus));
+    }
+
+    public List<Aufgabe> suchen(String q) {
+        if (q == null || q.isBlank()) return List.of();
+        String muster = "%" + q.toLowerCase() + "%";
+        return aufgabeRepository.findAll(byOrg().and(
+            (root, query, cb) -> cb.or(
+                cb.like(cb.lower(root.get("titel")), muster),
+                cb.like(cb.lower(root.get("beschreibung")), muster)
+            )
+        ));
+    }
+
+    @Transactional
+    public void abhaengigkeitHinzufuegen(Long aufgabeId, Long blockiertVonId) {
+        if (aufgabeId.equals(blockiertVonId)) return;
+        Aufgabe aufgabe = findByIdOrThrow(aufgabeId);
+        Aufgabe blocker = findByIdOrThrow(blockiertVonId);
+        if (wuerdeZyklusErstellen(aufgabe, blocker)) return;
+        aufgabe.getBlockiertVon().add(blocker);
+        aufgabeRepository.save(aufgabe);
+    }
+
+    @Transactional
+    public void abhaengigkeitEntfernen(Long aufgabeId, Long blockiertVonId) {
+        Aufgabe aufgabe = findByIdOrThrow(aufgabeId);
+        Aufgabe blocker = findByIdOrThrow(blockiertVonId);
+        aufgabe.getBlockiertVon().remove(blocker);
+        aufgabeRepository.save(aufgabe);
+    }
+
+    private boolean wuerdeZyklusErstellen(Aufgabe aufgabe, Aufgabe neuerBlocker) {
+        return istErreichbar(neuerBlocker, aufgabe.getId(), new java.util.HashSet<>());
+    }
+
+    private boolean istErreichbar(Aufgabe von, Long zielId, java.util.Set<Long> besucht) {
+        if (von.getId().equals(zielId)) return true;
+        if (!besucht.add(von.getId())) return false;
+        for (Aufgabe dep : von.getBlockiertVon()) {
+            if (istErreichbar(dep, zielId, besucht)) return true;
+        }
+        return false;
     }
 
     public List<Aufgabe> findByProjektId(Long projektId) {

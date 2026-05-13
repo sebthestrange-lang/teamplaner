@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}"
+      lang="de">
+<head><title>Suche</title></head>
+<body>
+<main layout:fragment="content">
+
+    <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a th:href="@{/}">Dashboard</a></li>
+            <li class="breadcrumb-item active">Suche</li>
+        </ol>
+    </nav>
+
+    <div class="page-header mb-4">
+        <h1 class="page-title">Suche</h1>
+    </div>
+
+    <div class="card card-custom mb-4">
+        <div class="card-body py-3">
+            <form th:action="@{/suche}" method="get" class="d-flex gap-2">
+                <input type="text" name="q" class="form-control"
+                       placeholder="Suche in Aufgaben, Projekten, Mitarbeitern, Meetings..."
+                       th:value="${q}" autofocus>
+                <button type="submit" class="btn btn-primary text-nowrap">
+                    <i class="bi bi-search me-1"></i>Suchen
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <div th:if="${q != null and !q.isBlank()}">
+
+        <!-- Aufgaben -->
+        <div th:if="${aufgaben != null and !#lists.isEmpty(aufgaben)}" class="mb-4">
+            <h6 class="text-muted text-uppercase fw-semibold mb-2" style="font-size:.7rem; letter-spacing:.05em">
+                <i class="bi bi-check2-square me-1"></i>Aufgaben
+                <span class="badge bg-secondary ms-1" th:text="${#lists.size(aufgaben)}"></span>
+            </h6>
+            <div class="card card-custom">
+                <div th:each="a : ${aufgaben}" class="d-flex align-items-center px-3 py-2 border-bottom">
+                    <div class="flex-grow-1 overflow-hidden">
+                        <a th:href="@{/aufgaben/{id}(id=${a.id})}"
+                           th:text="${a.titel}"
+                           class="text-decoration-none text-dark fw-medium"></a>
+                        <div class="small text-muted" th:if="${a.projekt}" th:text="${a.projekt.name}"></div>
+                    </div>
+                    <span th:class="'badge rounded-pill ms-2 bg-' + ${a.status.bootstrapKlasse}"
+                          th:text="${a.status.bezeichnung}"></span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Projekte -->
+        <div th:if="${projekte != null and !#lists.isEmpty(projekte)}" class="mb-4">
+            <h6 class="text-muted text-uppercase fw-semibold mb-2" style="font-size:.7rem; letter-spacing:.05em">
+                <i class="bi bi-folder2-open me-1"></i>Projekte
+                <span class="badge bg-secondary ms-1" th:text="${#lists.size(projekte)}"></span>
+            </h6>
+            <div class="card card-custom">
+                <div th:each="p : ${projekte}" class="d-flex align-items-center px-3 py-2 border-bottom">
+                    <div class="flex-grow-1 overflow-hidden">
+                        <a th:href="@{/projekte/{id}(id=${p.id})}"
+                           th:text="${p.name}"
+                           class="text-decoration-none text-dark fw-medium"></a>
+                        <div class="small text-muted text-truncate" th:if="${p.beschreibung}"
+                             th:text="${p.beschreibung}"></div>
+                    </div>
+                    <span th:class="'badge rounded-pill ms-2 bg-' + ${p.status.bootstrapKlasse}"
+                          th:text="${p.status.bezeichnung}"></span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mitarbeiter -->
+        <div th:if="${mitarbeiter != null and !#lists.isEmpty(mitarbeiter)}" class="mb-4">
+            <h6 class="text-muted text-uppercase fw-semibold mb-2" style="font-size:.7rem; letter-spacing:.05em">
+                <i class="bi bi-person-badge-fill me-1"></i>Mitarbeiter
+                <span class="badge bg-secondary ms-1" th:text="${#lists.size(mitarbeiter)}"></span>
+            </h6>
+            <div class="card card-custom">
+                <div th:each="ma : ${mitarbeiter}" class="d-flex align-items-center gap-3 px-3 py-2 border-bottom">
+                    <div class="avatar-sm flex-shrink-0"
+                         th:style="'background-color:' + ${ma.team?.farbe ?: '#6366f1'}"
+                         th:text="${ma.initialen}"></div>
+                    <div class="flex-grow-1 overflow-hidden">
+                        <a th:href="@{/mitarbeiter/{id}(id=${ma.id})}"
+                           th:text="${ma.vollstaendigerName}"
+                           class="text-decoration-none text-dark fw-medium"></a>
+                        <div class="small text-muted" th:text="${ma.rolle ?: '—'}"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Meetings -->
+        <div th:if="${meetings != null and !#lists.isEmpty(meetings)}" class="mb-4">
+            <h6 class="text-muted text-uppercase fw-semibold mb-2" style="font-size:.7rem; letter-spacing:.05em">
+                <i class="bi bi-camera-video me-1"></i>Meetings
+                <span class="badge bg-secondary ms-1" th:text="${#lists.size(meetings)}"></span>
+            </h6>
+            <div class="card card-custom">
+                <div th:each="m : ${meetings}" class="d-flex align-items-center px-3 py-2 border-bottom">
+                    <div class="flex-grow-1 overflow-hidden">
+                        <a th:href="@{/meetings/{id}(id=${m.id})}"
+                           th:text="${m.titel}"
+                           class="text-decoration-none text-dark fw-medium"></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Keine Ergebnisse -->
+        <div th:if="${(aufgaben == null or #lists.isEmpty(aufgaben)) and
+                      (projekte == null or #lists.isEmpty(projekte)) and
+                      (mitarbeiter == null or #lists.isEmpty(mitarbeiter)) and
+                      (meetings == null or #lists.isEmpty(meetings))}"
+             class="empty-state card-custom">
+            <i class="bi bi-search text-muted" style="font-size:3rem"></i>
+            <h5 class="mt-3 text-muted">Keine Ergebnisse für „<span th:text="${q}"></span>"</h5>
+        </div>
+
+    </div>
+
+</main>
+</body>
+</html>

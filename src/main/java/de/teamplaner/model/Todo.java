@@ -1,5 +1,6 @@
 package de.teamplaner.model;
 
+import de.teamplaner.model.enums.TodoWiederholung;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
@@ -53,4 +54,9 @@ public class Todo {
 
     @Column(name = "erledigt_am")
     private LocalDateTime erledigtAm;
+
+    @Builder.Default
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private TodoWiederholung wiederholung = TodoWiederholung.KEINE;
 }

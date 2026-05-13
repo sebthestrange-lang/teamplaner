@@ -22,6 +22,18 @@ public class MeetingService {
         return meetingRepository.findByOrganisationIdOrderByDatumDesc(orgContext.getOrgId());
     }
 
+    public List<Meeting> suchen(String q) {
+        if (q == null || q.isBlank()) return List.of();
+        Long orgId = orgContext.getOrgId();
+        String muster = "%" + q.toLowerCase() + "%";
+        return meetingRepository.findAll(
+            (root, query, cb) -> cb.and(
+                cb.equal(root.get("organisation").get("id"), orgId),
+                cb.like(cb.lower(root.get("titel")), muster)
+            )
+        );
+    }
+
     public Meeting findByIdOrThrow(Long id) {
         return meetingRepository.findByIdAndOrganisationId(id, orgContext.getOrgId())
                 .orElseThrow(() -> new EntityNotFoundException("Meeting", id));

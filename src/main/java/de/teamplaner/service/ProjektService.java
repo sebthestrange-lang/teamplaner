@@ -45,6 +45,17 @@ public class ProjektService {
         return projektRepository.findAll(byOrg());
     }
 
+    public List<Projekt> suchen(String q) {
+        if (q == null || q.isBlank()) return List.of();
+        String muster = "%" + q.toLowerCase() + "%";
+        return projektRepository.findAll(byOrg().and(
+            (root, query, cb) -> cb.or(
+                cb.like(cb.lower(root.get("name")), muster),
+                cb.like(cb.lower(root.get("beschreibung")), muster)
+            )
+        ));
+    }
+
     public List<Projekt> mitFilter(ProjektFilterDTO filter) {
         return projektRepository.findAll(byOrg().and(ProjektSpecification.withFilter(filter)));
     }

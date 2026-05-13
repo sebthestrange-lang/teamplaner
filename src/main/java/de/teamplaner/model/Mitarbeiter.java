@@ -48,6 +48,10 @@ public class Mitarbeiter {
     @JoinColumn(name = "organisation_id", nullable = false)
     private Organisation organisation;
 
+    @Builder.Default
+    @Column(name = "benachrichtigungen_aktiv", nullable = false)
+    private boolean benachrichtigungenAktiv = true;
+
     @CreationTimestamp
     @Column(name = "erstellt_am", nullable = false, updatable = false)
     private LocalDateTime erstelltAm;

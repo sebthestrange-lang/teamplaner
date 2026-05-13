@@ -38,6 +38,12 @@ public class BenutzerService {
                 .orElseThrow(() -> new EntityNotFoundException("Benutzer", id));
     }
 
+    public Benutzer aktuellerBenutzer() {
+        String benutzername = SecurityContextHolder.getContext().getAuthentication().getName();
+        return benutzerRepository.findByBenutzername(benutzername)
+                .orElseThrow(() -> new IllegalStateException("Benutzer nicht gefunden: " + benutzername));
+    }
+
     @Transactional
     public Benutzer speichern(BenutzerFormDTO dto, Benutzer existing) {
         Benutzer benutzer = existing != null ? existing : new Benutzer();

@@ -36,6 +36,18 @@ public class MitarbeiterService {
         return mitarbeiterRepository.findAll(byOrg());
     }
 
+    public List<Mitarbeiter> suchen(String q) {
+        if (q == null || q.isBlank()) return List.of();
+        String muster = "%" + q.toLowerCase() + "%";
+        return mitarbeiterRepository.findAll(byOrg().and(
+            (root, query, cb) -> cb.or(
+                cb.like(cb.lower(root.get("vorname")), muster),
+                cb.like(cb.lower(root.get("nachname")), muster),
+                cb.like(cb.lower(root.get("email")), muster)
+            )
+        ));
+    }
+
     public List<Mitarbeiter> mitFilter(MitarbeiterFilterDTO filter) {
         return mitarbeiterRepository.findAll(byOrg().and(MitarbeiterSpecification.withFilter(filter)));
     }

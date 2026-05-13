@@ -3,44 +3,43 @@
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{layout}"
       lang="de">
-<head><title th:text="${aktion}">Team</title></head>
+<head><title th:text="${aktion}">Tag</title></head>
 <body>
 <main layout:fragment="content">
 
     <nav aria-label="breadcrumb" class="mb-3">
         <ol class="breadcrumb">
             <li class="breadcrumb-item"><a th:href="@{/}">Dashboard</a></li>
-            <li class="breadcrumb-item"><a th:href="@{/teams}">Teams</a></li>
+            <li class="breadcrumb-item"><a th:href="@{/tags}">Tags</a></li>
             <li class="breadcrumb-item active" th:text="${aktion}"></li>
         </ol>
     </nav>
 
     <div class="row justify-content-center">
-        <div class="col-lg-6">
+        <div class="col-lg-5">
             <div class="card card-custom">
                 <div class="card-header-custom">
                     <h5 class="mb-0" th:text="${aktion}"></h5>
                 </div>
                 <div class="card-body">
-                    <form th:action="${team.id != null} ? @{/teams/{id}(id=${team.id})} : @{/teams}"
-                          th:object="${team}" method="post">
+                    <form th:action="${tag.id != null} ? @{/tags/{id}(id=${tag.id})} : @{/tags}"
+                          th:object="${tag}" method="post">
 
                         <div class="mb-3">
                             <label for="name" class="form-label">Name <span class="text-danger">*</span></label>
                             <input type="text" id="name" th:field="*{name}"
                                    th:class="'form-control' + (${#fields.hasErrors('name')} ? ' is-invalid' : '')"
-                                   placeholder="z.B. Backend-Team">
+                                   placeholder="z.B. Bug, Feature, Blocker">
                             <div th:if="${#fields.hasErrors('name')}" class="invalid-feedback"
                                  th:errors="*{name}"></div>
                         </div>
 
                         <div class="mb-4">
-                            <label for="farbe" class="form-label">Teamfarbe</label>
-                            <div class="d-flex gap-3 align-items-center">
+                            <label for="farbe" class="form-label">Farbe</label>
+                            <div class="d-flex gap-2 align-items-center">
                                 <input type="color" id="farbe" th:field="*{farbe}"
-                                       class="form-control form-control-color"
-                                       style="width:60px; height:38px">
-                                <span class="text-muted small">Klicken zum Auswählen</span>
+                                       class="form-control form-control-color" style="width: 60px">
+                                <span class="text-muted small">Wähle eine Farbe für den Tag</span>
                             </div>
                         </div>
 
@@ -48,7 +47,7 @@
                             <button type="submit" class="btn btn-primary">
                                 <i class="bi bi-check-lg me-1"></i>Speichern
                             </button>
-                            <a th:href="@{/teams}" class="btn btn-light">Abbrechen</a>
+                            <a th:href="@{/tags}" class="btn btn-light">Abbrechen</a>
                         </div>
                     </form>
                 </div>

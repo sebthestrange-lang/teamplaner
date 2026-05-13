@@ -19,7 +19,18 @@ public class AufgabeSpecification {
                 .and(hatStatus(filter.getStatus()))
                 .and(hatPrioritaet(filter.getPrioritaet()))
                 .and(hatFaelligkeit(filter.getFaelligkeit()))
-                .and(enthältSuchtext(filter.getSuche()));
+                .and(enthältSuchtext(filter.getSuche()))
+                .and(hatTag(filter.getTagId()));
+    }
+
+    public static Specification<Aufgabe> withFilterIgnoreStatus(AufgabeFilterDTO filter) {
+        return hatTeam(filter.getTeamId())
+                .and(hatMitarbeiter(filter.getMitarbeiterId()))
+                .and(hatProjekt(filter.getProjektId()))
+                .and(hatPrioritaet(filter.getPrioritaet()))
+                .and(hatFaelligkeit(filter.getFaelligkeit()))
+                .and(enthältSuchtext(filter.getSuche()))
+                .and(hatTag(filter.getTagId()));
     }
 
     private static Specification<Aufgabe> hatTeam(Long teamId) {
@@ -72,5 +83,13 @@ public class AufgabeSpecification {
                 cb.like(cb.lower(root.get("titel")), muster),
                 cb.like(cb.lower(root.get("beschreibung")), muster)
         );
+    }
+
+    private static Specification<Aufgabe> hatTag(Long tagId) {
+        if (tagId == null) return Specification.unrestricted();
+        return (root, query, cb) -> {
+            query.distinct(true);
+            return cb.equal(root.join("tags").get("id"), tagId);
+        };
     }
 }

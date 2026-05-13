@@ -9,6 +9,7 @@
 
     <nav aria-label="breadcrumb" class="mb-3">
         <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a th:href="@{/}">Dashboard</a></li>
             <li class="breadcrumb-item"><a th:href="@{/aufgaben}">Aufgaben</a></li>
             <li class="breadcrumb-item active" th:text="${aktion}"></li>
         </ol>
@@ -80,6 +81,23 @@
                                 <label for="faelligAm" class="form-label">Fällig am</label>
                                 <input type="date" id="faelligAm" th:field="*{faelligAm}"
                                        class="form-control">
+                            </div>
+                        </div>
+
+                        <div th:if="${alleTags != null and !#lists.isEmpty(alleTags)}" class="mb-4">
+                            <label class="form-label">Tags</label>
+                            <div class="d-flex flex-wrap gap-2">
+                                <div th:each="tag : ${alleTags}" class="form-check">
+                                    <input type="checkbox" class="form-check-input"
+                                           name="tagIds" th:value="${tag.id}"
+                                           th:id="'tag-' + ${tag.id}"
+                                           th:checked="${aufgabe.tags != null and aufgabe.tags.contains(tag)}">
+                                    <label th:for="'tag-' + ${tag.id}" class="form-check-label">
+                                        <span class="badge rounded-pill"
+                                              th:style="'background-color:' + ${tag.farbe} + '22; color:' + ${tag.farbe}"
+                                              th:text="${tag.name}"></span>
+                                    </label>
+                                </div>
                             </div>
                         </div>
 

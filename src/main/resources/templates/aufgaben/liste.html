@@ -8,12 +8,25 @@
 <body>
 <main layout:fragment="content">
 
+    <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a th:href="@{/}">Dashboard</a></li>
+            <li class="breadcrumb-item active">Aufgaben</li>
+        </ol>
+    </nav>
+
     <div class="page-header mb-4 d-flex justify-content-between align-items-center">
         <div>
             <h1 class="page-title">Aufgaben</h1>
             <p class="text-muted mb-0" th:text="${#lists.size(aufgaben)} + ' Aufgaben'"></p>
         </div>
         <div class="d-flex gap-2">
+            <a th:href="@{/aufgaben}" class="btn btn-primary">
+                <i class="bi bi-list-ul me-1"></i>Liste
+            </a>
+            <a th:href="@{/aufgaben/board}" class="btn btn-outline-secondary">
+                <i class="bi bi-kanban me-1"></i>Board
+            </a>
             <a th:href="@{/aufgaben/export}" class="btn btn-outline-secondary">
                 <i class="bi bi-download me-1"></i>CSV
             </a>
@@ -84,7 +97,15 @@
                                 th:selected="${filter.prioritaet == p}"></option>
                     </select>
                 </div>
-                <div class="col-6 col-md-2 d-flex gap-1">
+                <div class="col-6 col-md-2">
+                    <label class="form-label small text-muted mb-1">Tag</label>
+                    <select name="tagId" class="form-select form-select-sm" onchange="this.form.submit()">
+                        <option value="">Alle</option>
+                        <option th:each="tag : ${tags}" th:value="${tag.id}" th:text="${tag.name}"
+                                th:selected="${filter.tagId == tag.id}"></option>
+                    </select>
+                </div>
+                <div class="col-6 col-md-2 d-flex gap-1 align-self-end">
                     <a th:href="@{/aufgaben}" class="btn btn-sm btn-light w-100" title="Filter zurücksetzen">
                         <i class="bi bi-x-lg me-1"></i>Zurücksetzen
                     </a>
@@ -120,6 +141,13 @@
                             <a th:href="@{/aufgaben/{id}(id=${aufgabe.id})}"
                                th:text="${aufgabe.titel}"
                                class="text-decoration-none text-dark"></a>
+                            <div th:if="${!aufgabe.tags.isEmpty()}" class="mt-1 d-flex gap-1 flex-wrap">
+                                <span th:each="tag : ${aufgabe.tags}"
+                                      class="badge rounded-pill"
+                                      style="font-size:0.6rem"
+                                      th:style="'font-size:0.6rem; background-color:' + ${tag.farbe} + '22; color:' + ${tag.farbe}"
+                                      th:text="${tag.name}"></span>
+                            </div>
                         </td>
                         <td class="d-none d-md-table-cell">
                             <a th:if="${aufgabe.projekt}"

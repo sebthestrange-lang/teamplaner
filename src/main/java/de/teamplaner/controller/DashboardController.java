@@ -36,6 +36,11 @@ public class DashboardController {
     private final TodoService todoService;
     private final BenutzerService benutzerService;
 
+    @GetMapping("/dashboard")
+    public String dashboardRedirect() {
+        return "redirect:/";
+    }
+
     @GetMapping
     public String dashboard(Model model) {
         model.addAttribute("anzahlTeams", teamService.anzahl());

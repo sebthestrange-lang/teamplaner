@@ -7,6 +7,13 @@
 <body>
 <main layout:fragment="content">
 
+    <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a th:href="@{/}">Dashboard</a></li>
+            <li class="breadcrumb-item active">Organisationen</li>
+        </ol>
+    </nav>
+
     <div class="page-header mb-4 d-flex justify-content-between align-items-center">
         <h1 class="page-title mb-0"><i class="bi bi-building me-2"></i>Organisationen</h1>
         <a th:href="@{/organisationen/neu}" class="btn btn-primary">

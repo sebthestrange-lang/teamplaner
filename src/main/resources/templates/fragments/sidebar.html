@@ -33,6 +33,19 @@
         </a>
     </div>
 
+    <!-- Suche -->
+    <div class="px-3 pb-2">
+        <form th:action="@{/suche}" method="get">
+            <div class="input-group input-group-sm">
+                <input type="text" name="q" class="form-control sidebar-search-input"
+                       placeholder="Suchen...">
+                <button type="submit" class="btn btn-sm sidebar-search-btn">
+                    <i class="bi bi-search"></i>
+                </button>
+            </div>
+        </form>
+    </div>
+
     <!-- Navigation -->
     <ul class="nav flex-column sidebar-nav px-3 flex-grow-1">
 
@@ -113,6 +126,15 @@
         </li>
 
         <li class="sidebar-section-label">Aufgaben</li>
+
+        <li class="nav-item">
+            <a th:href="@{/tags}"
+               th:classappend="${currentUri?.startsWith('/tags')} ? 'active' : ''"
+               class="nav-link sidebar-link" sec:authorize="hasAnyRole('ADMIN','MANAGER')">
+                <i class="bi bi-tag-fill"></i>
+                <span>Tags</span>
+            </a>
+        </li>
 
         <li class="nav-item">
             <a th:href="@{/aufgaben}"

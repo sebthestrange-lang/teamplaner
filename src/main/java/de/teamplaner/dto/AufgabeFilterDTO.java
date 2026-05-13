@@ -13,4 +13,5 @@ public class AufgabeFilterDTO {
     private Prioritaet prioritaet;
     private String faelligkeit;
     private String suche;
+    private Long tagId;
 }

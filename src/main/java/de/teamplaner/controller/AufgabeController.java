@@ -1,17 +1,17 @@
 package de.teamplaner.controller;
 
+import de.teamplaner.config.OrgContext;
 import de.teamplaner.dto.AufgabeFilterDTO;
 import de.teamplaner.model.Aufgabe;
 import de.teamplaner.model.enums.AufgabenStatus;
 import de.teamplaner.model.enums.Prioritaet;
-import de.teamplaner.service.AufgabeService;
-import de.teamplaner.service.MitarbeiterService;
-import de.teamplaner.service.ProjektService;
-import de.teamplaner.service.TeamService;
+import de.teamplaner.service.*;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -21,6 +21,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.List;
+import java.util.Map;
 
 @Controller
 @RequestMapping("/aufgaben")
@@ -31,6 +32,10 @@ public class AufgabeController {
     private final ProjektService projektService;
     private final MitarbeiterService mitarbeiterService;
     private final TeamService teamService;
+    private final TagService tagService;
+    private final KommentarService kommentarService;
+    private final BenutzerService benutzerService;
+    private final OrgContext orgContext;
 
     @GetMapping
     public String liste(@ModelAttribute AufgabeFilterDTO filter, Model model) {
@@ -40,13 +45,33 @@ public class AufgabeController {
         model.addAttribute("mitarbeiter", mitarbeiterService.alleMitarbeiter());
         model.addAttribute("aufgabenStatus", AufgabenStatus.values());
         model.addAttribute("prioritaeten", Prioritaet.values());
+        model.addAttribute("tags", tagService.alleTags());
         model.addAttribute("filter", filter);
         return "aufgaben/liste";
     }
 
+    @GetMapping("/board")
+    public String board(@ModelAttribute AufgabeFilterDTO filter, Model model) {
+        Map<AufgabenStatus, List<Aufgabe>> board = aufgabeService.boardView(filter);
+        model.addAttribute("offeneAufgaben", board.getOrDefault(AufgabenStatus.OFFEN, List.of()));
+        model.addAttribute("inBearbeitungAufgaben", board.getOrDefault(AufgabenStatus.IN_BEARBEITUNG, List.of()));
+        model.addAttribute("abgeschlosseneAufgaben", board.getOrDefault(AufgabenStatus.ABGESCHLOSSEN, List.of()));
+        model.addAttribute("teams", teamService.alleTeams());
+        model.addAttribute("projekte", projektService.alleProjekte());
+        model.addAttribute("mitarbeiter", mitarbeiterService.alleMitarbeiter());
+        model.addAttribute("tags", tagService.alleTags());
+        model.addAttribute("filter", filter);
+        return "aufgaben/board";
+    }
+
     @GetMapping("/{id}")
     public String detail(@PathVariable Long id, Model model) {
-        model.addAttribute("aufgabe", aufgabeService.findByIdOrThrow(id));
+        Aufgabe aufgabe = aufgabeService.findByIdOrThrow(id);
+        model.addAttribute("aufgabe", aufgabe);
+        model.addAttribute("kommentare", kommentarService.fuerAufgabe(id));
+        model.addAttribute("alleAufgaben", aufgabeService.alleAufgaben().stream()
+                .filter(a -> !a.getId().equals(id))
+                .toList());
         return "aufgaben/detail";
     }
 
@@ -63,6 +88,7 @@ public class AufgabeController {
         model.addAttribute("mitarbeiter", mitarbeiterService.alleMitarbeiter());
         model.addAttribute("aufgabenStatus", AufgabenStatus.values());
         model.addAttribute("prioritaeten", Prioritaet.values());
+        model.addAttribute("alleTags", tagService.alleTags());
         model.addAttribute("aktion", "Neue Aufgabe");
         return "aufgaben/formular";
     }
@@ -70,6 +96,7 @@ public class AufgabeController {
     @PostMapping
     public String erstellen(@Valid @ModelAttribute("aufgabe") Aufgabe aufgabe,
                             BindingResult result,
+                            @RequestParam(required = false) List<Long> tagIds,
                             Model model,
                             RedirectAttributes redirectAttributes) {
         if (result.hasErrors()) {
@@ -77,8 +104,12 @@ public class AufgabeController {
             model.addAttribute("mitarbeiter", mitarbeiterService.alleMitarbeiter());
             model.addAttribute("aufgabenStatus", AufgabenStatus.values());
             model.addAttribute("prioritaeten", Prioritaet.values());
+            model.addAttribute("alleTags", tagService.alleTags());
             model.addAttribute("aktion", "Neue Aufgabe");
             return "aufgaben/formular";
+        }
+        if (tagIds != null) {
+            tagIds.stream().map(tagService::findByIdOrThrow).forEach(aufgabe.getTags()::add);
         }
         aufgabeService.speichern(aufgabe);
         redirectAttributes.addFlashAttribute("erfolgsMeldung", "Aufgabe wurde erstellt.");
@@ -92,6 +123,7 @@ public class AufgabeController {
         model.addAttribute("mitarbeiter", mitarbeiterService.alleMitarbeiter());
         model.addAttribute("aufgabenStatus", AufgabenStatus.values());
         model.addAttribute("prioritaeten", Prioritaet.values());
+        model.addAttribute("alleTags", tagService.alleTags());
         model.addAttribute("aktion", "Aufgabe bearbeiten");
         return "aufgaben/formular";
     }
@@ -100,6 +132,7 @@ public class AufgabeController {
     public String aktualisieren(@PathVariable Long id,
                                 @Valid @ModelAttribute("aufgabe") Aufgabe formDaten,
                                 BindingResult result,
+                                @RequestParam(required = false) List<Long> tagIds,
                                 Model model,
                                 RedirectAttributes redirectAttributes) {
         if (result.hasErrors()) {
@@ -107,6 +140,7 @@ public class AufgabeController {
             model.addAttribute("mitarbeiter", mitarbeiterService.alleMitarbeiter());
             model.addAttribute("aufgabenStatus", AufgabenStatus.values());
             model.addAttribute("prioritaeten", Prioritaet.values());
+            model.addAttribute("alleTags", tagService.alleTags());
             model.addAttribute("aktion", "Aufgabe bearbeiten");
             return "aufgaben/formular";
         }
@@ -117,8 +151,42 @@ public class AufgabeController {
         aufgabe.setProjekt(formDaten.getProjekt());
         aufgabe.setMitarbeiter(formDaten.getMitarbeiter());
         aufgabe.setFaelligAm(formDaten.getFaelligAm());
+        aufgabe.getTags().clear();
+        if (tagIds != null) {
+            tagIds.stream().map(tagService::findByIdOrThrow).forEach(aufgabe.getTags()::add);
+        }
         aufgabeService.statusAendern(aufgabe, formDaten.getStatus());
         redirectAttributes.addFlashAttribute("erfolgsMeldung", "Aufgabe wurde aktualisiert.");
+        return "redirect:/aufgaben/" + id;
+    }
+
+    @PostMapping("/{id}/kommentar")
+    public String kommentarHinzufuegen(@PathVariable Long id,
+                                       @RequestParam String inhalt) {
+        if (inhalt != null && !inhalt.isBlank()) {
+            Aufgabe aufgabe = aufgabeService.findByIdOrThrow(id);
+            kommentarService.anlegen(aufgabe, benutzerService.aktuellerBenutzer(), inhalt);
+        }
+        return "redirect:/aufgaben/" + id;
+    }
+
+    @PostMapping("/{id}/kommentar/{kommentarId}/loeschen")
+    public String kommentarLoeschen(@PathVariable Long id, @PathVariable Long kommentarId) {
+        kommentarService.loeschen(kommentarId);
+        return "redirect:/aufgaben/" + id;
+    }
+
+    @PostMapping("/{id}/abhaengigkeit")
+    public String abhaengigkeitHinzufuegen(@PathVariable Long id,
+                                           @RequestParam Long blockiertVonId) {
+        aufgabeService.abhaengigkeitHinzufuegen(id, blockiertVonId);
+        return "redirect:/aufgaben/" + id;
+    }
+
+    @PostMapping("/{id}/abhaengigkeit/{blockiertVonId}/loeschen")
+    public String abhaengigkeitEntfernen(@PathVariable Long id,
+                                         @PathVariable Long blockiertVonId) {
+        aufgabeService.abhaengigkeitEntfernen(id, blockiertVonId);
         return "redirect:/aufgaben/" + id;
     }
 

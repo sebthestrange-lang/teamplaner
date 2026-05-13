@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      layout:decorate="~{layout}"
+      lang="de">
+<head><title>Aufgaben – Board</title></head>
+<body>
+<main layout:fragment="content">
+
+    <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a th:href="@{/}">Dashboard</a></li>
+            <li class="breadcrumb-item"><a th:href="@{/aufgaben}">Aufgaben</a></li>
+            <li class="breadcrumb-item active">Board</li>
+        </ol>
+    </nav>
+
+    <div class="page-header mb-4 d-flex justify-content-between align-items-center">
+        <div>
+            <h1 class="page-title">Aufgaben</h1>
+            <p class="text-muted mb-0"
+               th:text="${#lists.size(offeneAufgaben) + #lists.size(inBearbeitungAufgaben) + #lists.size(abgeschlosseneAufgaben)} + ' Aufgaben'"></p>
+        </div>
+        <div class="d-flex gap-2">
+            <a th:href="@{/aufgaben}" class="btn btn-outline-secondary">
+                <i class="bi bi-list-ul me-1"></i>Liste
+            </a>
+            <a th:href="@{/aufgaben/board}" class="btn btn-primary">
+                <i class="bi bi-kanban me-1"></i>Board
+            </a>
+            <a th:href="@{/aufgaben/neu}" class="btn btn-primary">
+                <i class="bi bi-plus-lg me-1"></i>Neue Aufgabe
+            </a>
+        </div>
+    </div>
+
+    <!-- Filter -->
+    <div class="card card-custom mb-4">
+        <div class="card-body py-3">
+            <form th:action="@{/aufgaben/board}" method="get" class="row g-2 align-items-end">
+                <div class="col-6 col-md-2">
+                    <label class="form-label small text-muted mb-1">Team</label>
+                    <select name="teamId" class="form-select form-select-sm" onchange="this.form.submit()">
+                        <option value="">Alle</option>
+                        <option th:each="team : ${teams}" th:value="${team.id}" th:text="${team.name}"
+                                th:selected="${filter.teamId == team.id}"></option>
+                    </select>
+                </div>
+                <div class="col-6 col-md-2">
+                    <label class="form-label small text-muted mb-1">Mitarbeiter</label>
+                    <select name="mitarbeiterId" class="form-select form-select-sm" onchange="this.form.submit()">
+                        <option value="">Alle</option>
+                        <option th:each="ma : ${mitarbeiter}" th:value="${ma.id}"
+                                th:text="${ma.vollstaendigerName}"
+                                th:selected="${filter.mitarbeiterId == ma.id}"></option>
+                    </select>
+                </div>
+                <div class="col-6 col-md-2">
+                    <label class="form-label small text-muted mb-1">Projekt</label>
+                    <select name="projektId" class="form-select form-select-sm" onchange="this.form.submit()">
+                        <option value="">Alle</option>
+                        <option th:each="p : ${projekte}" th:value="${p.id}" th:text="${p.name}"
+                                th:selected="${filter.projektId == p.id}"></option>
+                    </select>
+                </div>
+                <div class="col-6 col-md-2">
+                    <label class="form-label small text-muted mb-1">Tag</label>
+                    <select name="tagId" class="form-select form-select-sm" onchange="this.form.submit()">
+                        <option value="">Alle</option>
+                        <option th:each="tag : ${tags}" th:value="${tag.id}" th:text="${tag.name}"
+                                th:selected="${filter.tagId == tag.id}"></option>
+                    </select>
+                </div>
+                <div class="col-6 col-md-2">
+                    <label class="form-label small text-muted mb-1">Suche</label>
+                    <input type="text" name="suche" class="form-control form-control-sm"
+                           placeholder="Titel..." th:value="${filter.suche}">
+                </div>
+                <div class="col-6 col-md-2 d-flex gap-1">
+                    <button type="submit" class="btn btn-sm btn-primary flex-grow-1">
+                        <i class="bi bi-funnel"></i>
+                    </button>
+                    <a th:href="@{/aufgaben/board}" class="btn btn-sm btn-light" title="Zurücksetzen">
+                        <i class="bi bi-x-lg"></i>
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- CSRF für AJAX -->
+    <meta id="csrf-token" name="_csrf" th:content="${_csrf.token}">
+    <meta id="csrf-header" name="_csrf_param" th:content="${_csrf.parameterName}">
+
+    <!-- Kanban Board -->
+    <div class="kanban-board d-flex gap-3 pb-3" style="overflow-x: auto; min-height: 500px;">
+
+        <!-- Spalte: Offen -->
+        <div class="kanban-column flex-shrink-0" style="width: 320px">
+            <div class="kanban-col-header d-flex align-items-center justify-content-between px-3 py-2 mb-2 rounded">
+                <span class="fw-semibold text-secondary">
+                    <i class="bi bi-circle me-1"></i>Offen
+                </span>
+                <span class="badge bg-secondary rounded-pill" th:text="${#lists.size(offeneAufgaben)}"></span>
+            </div>
+            <div class="kanban-col-body" id="col-OFFEN" data-status="OFFEN">
+                <div th:each="aufgabe : ${offeneAufgaben}"
+                     class="kanban-card card mb-2"
+                     th:data-id="${aufgabe.id}"
+                     th:classappend="${aufgabe.faelligAm != null and aufgabe.faelligAm.isBefore(#temporals.createToday()) and aufgabe.status.name() != 'ABGESCHLOSSEN'} ? ' border-danger' : ''">
+                    <div class="card-body p-3">
+                        <div class="d-flex justify-content-between align-items-start mb-1">
+                            <a th:href="@{/aufgaben/{id}(id=${aufgabe.id})}"
+                               th:text="${aufgabe.titel}"
+                               class="text-decoration-none text-dark fw-medium small"></a>
+                            <span th:class="'badge rounded-pill ms-1 flex-shrink-0 bg-' + ${aufgabe.prioritaet.bootstrapKlasse}"
+                                  th:text="${aufgabe.prioritaet.bezeichnung}"></span>
+                        </div>
+                        <div th:if="${aufgabe.projekt}" class="small text-muted text-truncate mb-1"
+                             th:text="${aufgabe.projekt.name}"></div>
+                        <div class="d-flex align-items-center justify-content-between mt-2">
+                            <div th:if="${aufgabe.mitarbeiter}" class="d-flex align-items-center gap-1">
+                                <span class="avatar-xs"
+                                      th:style="'background-color:' + ${aufgabe.mitarbeiter.team?.farbe ?: '#6366f1'}"
+                                      th:text="${aufgabe.mitarbeiter.initialen}"></span>
+                                <span class="small text-muted" th:text="${aufgabe.mitarbeiter.vollstaendigerName}"></span>
+                            </div>
+                            <div th:unless="${aufgabe.mitarbeiter}"></div>
+                            <div th:if="${aufgabe.faelligAm}" class="small"
+                                 th:class="'small ' + (${aufgabe.faelligAm.isBefore(#temporals.createToday())} ? 'text-danger' : 'text-muted')">
+                                <i class="bi bi-calendar3 me-1"></i>
+                                <span th:text="${#temporals.format(aufgabe.faelligAm, 'dd.MM.')}"></span>
+                            </div>
+                        </div>
+                        <div th:if="${!aufgabe.tags.isEmpty()}" class="mt-2 d-flex gap-1 flex-wrap">
+                            <span th:each="tag : ${aufgabe.tags}"
+                                  class="badge rounded-pill"
+                                  th:style="'background-color:' + ${tag.farbe} + '22; color:' + ${tag.farbe}"
+                                  th:text="${tag.name}"></span>
+                        </div>
+                    </div>
+                </div>
+                <div th:if="${#lists.isEmpty(offeneAufgaben)}"
+                     class="kanban-empty text-center text-muted small py-4">
+                    Keine Aufgaben
+                </div>
+            </div>
+        </div>
+
+        <!-- Spalte: In Bearbeitung -->
+        <div class="kanban-column flex-shrink-0" style="width: 320px">
+            <div class="kanban-col-header d-flex align-items-center justify-content-between px-3 py-2 mb-2 rounded">
+                <span class="fw-semibold text-primary">
+                    <i class="bi bi-arrow-repeat me-1"></i>In Bearbeitung
+                </span>
+                <span class="badge bg-primary rounded-pill" th:text="${#lists.size(inBearbeitungAufgaben)}"></span>
+            </div>
+            <div class="kanban-col-body" id="col-IN_BEARBEITUNG" data-status="IN_BEARBEITUNG">
+                <div th:each="aufgabe : ${inBearbeitungAufgaben}"
+                     class="kanban-card card mb-2"
+                     th:data-id="${aufgabe.id}"
+                     th:classappend="${aufgabe.faelligAm != null and aufgabe.faelligAm.isBefore(#temporals.createToday()) and aufgabe.status.name() != 'ABGESCHLOSSEN'} ? ' border-danger' : ''">
+                    <div class="card-body p-3">
+                        <div class="d-flex justify-content-between align-items-start mb-1">
+                            <a th:href="@{/aufgaben/{id}(id=${aufgabe.id})}"
+                               th:text="${aufgabe.titel}"
+                               class="text-decoration-none text-dark fw-medium small"></a>
+                            <span th:class="'badge rounded-pill ms-1 flex-shrink-0 bg-' + ${aufgabe.prioritaet.bootstrapKlasse}"
+                                  th:text="${aufgabe.prioritaet.bezeichnung}"></span>
+                        </div>
+                        <div th:if="${aufgabe.projekt}" class="small text-muted text-truncate mb-1"
+                             th:text="${aufgabe.projekt.name}"></div>
+                        <div class="d-flex align-items-center justify-content-between mt-2">
+                            <div th:if="${aufgabe.mitarbeiter}" class="d-flex align-items-center gap-1">
+                                <span class="avatar-xs"
+                                      th:style="'background-color:' + ${aufgabe.mitarbeiter.team?.farbe ?: '#6366f1'}"
+                                      th:text="${aufgabe.mitarbeiter.initialen}"></span>
+                                <span class="small text-muted" th:text="${aufgabe.mitarbeiter.vollstaendigerName}"></span>
+                            </div>
+                            <div th:unless="${aufgabe.mitarbeiter}"></div>
+                            <div th:if="${aufgabe.faelligAm}" class="small"
+                                 th:class="'small ' + (${aufgabe.faelligAm.isBefore(#temporals.createToday())} ? 'text-danger' : 'text-muted')">
+                                <i class="bi bi-calendar3 me-1"></i>
+                                <span th:text="${#temporals.format(aufgabe.faelligAm, 'dd.MM.')}"></span>
+                            </div>
+                        </div>
+                        <div th:if="${!aufgabe.tags.isEmpty()}" class="mt-2 d-flex gap-1 flex-wrap">
+                            <span th:each="tag : ${aufgabe.tags}"
+                                  class="badge rounded-pill"
+                                  th:style="'background-color:' + ${tag.farbe} + '22; color:' + ${tag.farbe}"
+                                  th:text="${tag.name}"></span>
+                        </div>
+                    </div>
+                </div>
+                <div th:if="${#lists.isEmpty(inBearbeitungAufgaben)}"
+                     class="kanban-empty text-center text-muted small py-4">
+                    Keine Aufgaben
+                </div>
+            </div>
+        </div>
+
+        <!-- Spalte: Abgeschlossen -->
+        <div class="kanban-column flex-shrink-0" style="width: 320px">
+            <div class="kanban-col-header d-flex align-items-center justify-content-between px-3 py-2 mb-2 rounded">
+                <span class="fw-semibold text-success">
+                    <i class="bi bi-check-circle me-1"></i>Abgeschlossen
+                </span>
+                <span class="badge bg-success rounded-pill" th:text="${#lists.size(abgeschlosseneAufgaben)}"></span>
+            </div>
+            <div class="kanban-col-body" id="col-ABGESCHLOSSEN" data-status="ABGESCHLOSSEN">
+                <div th:each="aufgabe : ${abgeschlosseneAufgaben}"
+                     class="kanban-card card mb-2 opacity-75"
+                     th:data-id="${aufgabe.id}">
+                    <div class="card-body p-3">
+                        <div class="d-flex justify-content-between align-items-start mb-1">
+                            <a th:href="@{/aufgaben/{id}(id=${aufgabe.id})}"
+                               th:text="${aufgabe.titel}"
+                               class="text-decoration-none text-muted fw-medium small text-decoration-line-through"></a>
+                            <span th:class="'badge rounded-pill ms-1 flex-shrink-0 bg-' + ${aufgabe.prioritaet.bootstrapKlasse}"
+                                  th:text="${aufgabe.prioritaet.bezeichnung}"></span>
+                        </div>
+                        <div th:if="${aufgabe.projekt}" class="small text-muted text-truncate mb-1"
+                             th:text="${aufgabe.projekt.name}"></div>
+                        <div class="d-flex align-items-center justify-content-between mt-2">
+                            <div th:if="${aufgabe.mitarbeiter}" class="d-flex align-items-center gap-1">
+                                <span class="avatar-xs"
+                                      th:style="'background-color:' + ${aufgabe.mitarbeiter.team?.farbe ?: '#6366f1'}"
+                                      th:text="${aufgabe.mitarbeiter.initialen}"></span>
+                                <span class="small text-muted" th:text="${aufgabe.mitarbeiter.vollstaendigerName}"></span>
+                            </div>
+                            <div th:unless="${aufgabe.mitarbeiter}"></div>
+                        </div>
+                        <div th:if="${!aufgabe.tags.isEmpty()}" class="mt-2 d-flex gap-1 flex-wrap">
+                            <span th:each="tag : ${aufgabe.tags}"
+                                  class="badge rounded-pill"
+                                  th:style="'background-color:' + ${tag.farbe} + '22; color:' + ${tag.farbe}"
+                                  th:text="${tag.name}"></span>
+                        </div>
+                    </div>
+                </div>
+                <div th:if="${#lists.isEmpty(abgeschlosseneAufgaben)}"
+                     class="kanban-empty text-center text-muted small py-4">
+                    Keine Aufgaben
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+</main>
+
+<th:block layout:fragment="scripts">
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>
+<script>
+    const csrfParam = document.querySelector('meta[name="_csrf_param"]').content;
+    const csrfToken = document.querySelector('meta[name="_csrf"]').content;
+
+    ['col-OFFEN', 'col-IN_BEARBEITUNG', 'col-ABGESCHLOSSEN'].forEach(colId => {
+        const el = document.getElementById(colId);
+        if (!el) return;
+        new Sortable(el, {
+            group: 'aufgaben',
+            animation: 150,
+            ghostClass: 'kanban-ghost',
+            chosenClass: 'kanban-chosen',
+            onEnd: function(evt) {
+                if (evt.from === evt.to) return;
+                const aufgabeId = evt.item.dataset.id;
+                const neuerStatus = evt.to.dataset.status;
+                const formData = new FormData();
+                formData.append('status', neuerStatus);
+                formData.append(csrfParam, csrfToken);
+                fetch('/aufgaben/' + aufgabeId + '/status', {
+                    method: 'POST',
+                    body: formData
+                }).then(r => {
+                    if (!r.ok) {
+                        evt.from.insertBefore(evt.item, evt.from.children[evt.oldIndex] || null);
+                        alert('Statuswechsel fehlgeschlagen');
+                    }
+                });
+            }
+        });
+    });
+</script>
+</th:block>
+</body>
+</html>

@@ -4,6 +4,7 @@ import de.teamplaner.config.OrgContext;
 import de.teamplaner.dto.TodoFilterDTO;
 import de.teamplaner.exception.EntityNotFoundException;
 import de.teamplaner.model.Todo;
+import de.teamplaner.model.enums.TodoWiederholung;
 import de.teamplaner.repository.TodoRepository;
 import de.teamplaner.specification.TodoSpecification;
 import lombok.RequiredArgsConstructor;
@@ -85,7 +86,38 @@ public class TodoService {
         todo.setErledigtAm(todo.isErledigt() ? LocalDateTime.now() : null);
         Todo gespeichert = todoRepository.save(todo);
         auditService.log("Todo", id, "UPDATE");
+
+        if (todo.isErledigt() && todo.getWiederholung() != TodoWiederholung.KEINE) {
+            naechsteInstanzErstellen(todo);
+        }
         return gespeichert;
+    }
+
+    private void naechsteInstanzErstellen(Todo erledigt) {
+        LocalDate naechstFaellig = berechneNaechstesFaelligkeitsdatum(
+                erledigt.getFaelligAm() != null ? erledigt.getFaelligAm() : LocalDate.now(),
+                erledigt.getWiederholung());
+        if (naechstFaellig == null) return;
+
+        Todo naechste = new Todo();
+        naechste.setTitel(erledigt.getTitel());
+        naechste.setBeschreibung(erledigt.getBeschreibung());
+        naechste.setPrioritaet(erledigt.getPrioritaet());
+        naechste.setWiederholung(erledigt.getWiederholung());
+        naechste.setFaelligAm(naechstFaellig);
+        naechste.setOrganisation(erledigt.getOrganisation());
+        todoRepository.save(naechste);
+        auditService.log("Todo", naechste.getId(), "CREATE");
+        log.debug("Wiederkehrendes Todo erstellt: {} fällig am {}", naechste.getTitel(), naechstFaellig);
+    }
+
+    private LocalDate berechneNaechstesFaelligkeitsdatum(LocalDate basis, TodoWiederholung wiederholung) {
+        return switch (wiederholung) {
+            case TAEGLICH -> basis.plusDays(1);
+            case WOECHENTLICH -> basis.plusWeeks(1);
+            case MONATLICH -> basis.plusMonths(1);
+            default -> null;
+        };
     }
 
     @Transactional

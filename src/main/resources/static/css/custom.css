@@ -454,6 +454,18 @@ body {
     .page-title {
         font-size: 1.25rem;
     }
+
+    /* Detail-page title + badges: allow wrapping */
+    .page-title-group {
+        flex-wrap: wrap;
+        row-gap: 0.25rem;
+    }
+
+    /* Page header actions: shrink buttons */
+    .page-header-actions {
+        flex-wrap: wrap;
+        justify-content: flex-end;
+    }
 }
 
 /* ===========================
@@ -617,4 +629,17 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
+}
+
+@media (max-width: 767.98px) {
+    .kanban-board {
+        flex-direction: column !important;
+        overflow-x: unset !important;
+    }
+    .kanban-column {
+        width: 100% !important;
+    }
+    .kanban-col-body {
+        min-height: 80px;
+    }
 }

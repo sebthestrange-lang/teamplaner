@@ -108,13 +108,20 @@
                         </div>
                         <div th:unless="${#lists.isEmpty(heuteFaelligeAufgaben)}" class="table-responsive">
                             <table class="table table-hover mb-0">
-                                <thead><tr><th>Aufgabe</th><th>Priorität</th><th>Mitarbeiter</th><th>Status</th></tr></thead>
+                                <thead>
+                                    <tr>
+                                        <th>Aufgabe</th>
+                                        <th>Priorität</th>
+                                        <th class="d-none d-sm-table-cell">Mitarbeiter</th>
+                                        <th class="d-none d-sm-table-cell">Status</th>
+                                    </tr>
+                                </thead>
                                 <tbody>
                                     <tr th:each="aufgabe : ${heuteFaelligeAufgaben}">
                                         <td><a th:href="@{/aufgaben/{id}(id=${aufgabe.id})}" th:text="${aufgabe.titel}" class="text-decoration-none fw-medium link-dark"></a></td>
                                         <td><span th:class="'badge rounded-pill bg-' + ${aufgabe.prioritaet.bootstrapKlasse}" th:text="${aufgabe.prioritaet.bezeichnung}"></span></td>
-                                        <td th:text="${aufgabe.mitarbeiter?.vollstaendigerName ?: '—'}"></td>
-                                        <td><span th:class="'badge rounded-pill bg-' + ${aufgabe.status.bootstrapKlasse}" th:text="${aufgabe.status.bezeichnung}"></span></td>
+                                        <td class="d-none d-sm-table-cell" th:text="${aufgabe.mitarbeiter?.vollstaendigerName ?: '—'}"></td>
+                                        <td class="d-none d-sm-table-cell"><span th:class="'badge rounded-pill bg-' + ${aufgabe.status.bootstrapKlasse}" th:text="${aufgabe.status.bezeichnung}"></span></td>
                                     </tr>
                                 </tbody>
                             </table>

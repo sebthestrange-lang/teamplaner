@@ -16,12 +16,12 @@
     </nav>
 
     <div class="page-header mb-4 d-flex justify-content-between align-items-start">
-        <div class="d-flex align-items-center gap-3">
-            <div class="avatar-lg"
+        <div class="d-flex align-items-center gap-3 me-2 overflow-hidden">
+            <div class="avatar-lg flex-shrink-0"
                  th:style="'background-color:' + ${mitarbeiter.team?.farbe ?: '#6366f1'}"
                  th:text="${mitarbeiter.initialen}"></div>
-            <div>
-                <h1 class="page-title mb-0" th:text="${mitarbeiter.vollstaendigerName}"></h1>
+            <div class="overflow-hidden">
+                <h1 class="page-title mb-0 text-truncate" th:text="${mitarbeiter.vollstaendigerName}"></h1>
                 <span class="text-muted" th:text="${mitarbeiter.rolle ?: '—'}"></span>
                 <div th:if="${mitarbeiter.team}" class="mt-1">
                     <a th:href="@{/teams/{id}(id=${mitarbeiter.team.id})}"
@@ -31,13 +31,13 @@
                 </div>
             </div>
         </div>
-        <div class="d-flex gap-2">
+        <div class="d-flex gap-2 flex-shrink-0">
             <a th:href="@{/mitarbeiter/{id}/bearbeiten(id=${mitarbeiter.id})}" class="btn btn-outline-primary">
-                <i class="bi bi-pencil me-1"></i>Bearbeiten
+                <i class="bi bi-pencil"></i><span class="d-none d-sm-inline ms-1">Bearbeiten</span>
             </a>
             <button type="button" class="btn btn-outline-danger"
                     th:onclick="'loeschenBestaetigen(\'/mitarbeiter/' + ${mitarbeiter.id} + '/loeschen\')'">
-                <i class="bi bi-trash me-1"></i>Löschen
+                <i class="bi bi-trash"></i><span class="d-none d-sm-inline ms-1">Löschen</span>
             </button>
         </div>
     </div>

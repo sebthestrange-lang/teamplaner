@@ -16,8 +16,8 @@
     </nav>
 
     <div class="page-header mb-4 d-flex justify-content-between align-items-start">
-        <div>
-            <div class="d-flex align-items-center gap-2 mb-1">
+        <div class="me-2">
+            <div class="d-flex align-items-center flex-wrap gap-2 mb-1 page-title-group">
                 <h1 class="page-title mb-0" th:text="${aufgabe.titel}"></h1>
                 <span th:class="'badge rounded-pill bg-' + ${aufgabe.prioritaet.bootstrapKlasse}"
                       th:text="${aufgabe.prioritaet.bezeichnung}"></span>
@@ -26,9 +26,9 @@
             </div>
             <p th:if="${aufgabe.beschreibung}" class="text-muted" th:text="${aufgabe.beschreibung}"></p>
         </div>
-        <div class="d-flex gap-2">
+        <div class="d-flex gap-2 flex-shrink-0">
             <a th:href="@{/aufgaben/{id}/bearbeiten(id=${aufgabe.id})}" class="btn btn-outline-primary">
-                <i class="bi bi-pencil me-1"></i>Bearbeiten
+                <i class="bi bi-pencil"></i><span class="d-none d-sm-inline ms-1">Bearbeiten</span>
             </a>
             <button type="button" class="btn btn-outline-danger"
                     th:onclick="'loeschenBestaetigen(\'/aufgaben/' + ${aufgabe.id} + '/loeschen\')'">

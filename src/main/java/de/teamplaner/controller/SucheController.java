@@ -1,7 +1,6 @@
 package de.teamplaner.controller;
 
 import de.teamplaner.service.AufgabeService;
-import de.teamplaner.service.MeetingService;
 import de.teamplaner.service.MitarbeiterService;
 import de.teamplaner.service.ProjektService;
 import lombok.RequiredArgsConstructor;
@@ -19,7 +18,6 @@ public class SucheController {
     private final AufgabeService aufgabeService;
     private final ProjektService projektService;
     private final MitarbeiterService mitarbeiterService;
-    private final MeetingService meetingService;
 
     @GetMapping
     public String suche(@RequestParam(required = false, defaultValue = "") String q, Model model) {
@@ -28,7 +26,6 @@ public class SucheController {
             model.addAttribute("aufgaben", aufgabeService.suchen(q));
             model.addAttribute("projekte", projektService.suchen(q));
             model.addAttribute("mitarbeiter", mitarbeiterService.suchen(q));
-            model.addAttribute("meetings", meetingService.suchen(q));
         }
         return "suche/ergebnisse";
     }

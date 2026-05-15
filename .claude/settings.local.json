@@ -80,7 +80,8 @@
       "PowerShell(Start-Sleep -Seconds 5; Invoke-WebRequest -Uri \"http://localhost:8080\" -UseBasicParsing -TimeoutSec 5 | Select-Object -ExpandProperty StatusCode)",
       "PowerShell(Start-Sleep -Seconds 12; Invoke-WebRequest -Uri \"http://localhost:8080\" -UseBasicParsing -TimeoutSec 5 | Select-Object -ExpandProperty StatusCode)",
       "PowerShell(Invoke-WebRequest -Uri \"http://localhost:8080/aufgaben/board\" -UseBasicParsing -TimeoutSec 5 | Select-Object -ExpandProperty StatusCode)",
-      "PowerShell(Start-Sleep -Seconds 15; Invoke-WebRequest -Uri \"http://localhost:8080\" -UseBasicParsing -TimeoutSec 10 | Select-Object -ExpandProperty StatusCode)"
+      "PowerShell(Start-Sleep -Seconds 15; Invoke-WebRequest -Uri \"http://localhost:8080\" -UseBasicParsing -TimeoutSec 10 | Select-Object -ExpandProperty StatusCode)",
+      "PowerShell(Start-Sleep -Seconds 20; Invoke-WebRequest -Uri \"http://localhost:8080\" -UseBasicParsing -TimeoutSec 10 | Select-Object -ExpandProperty StatusCode)"
     ]
   }
 }

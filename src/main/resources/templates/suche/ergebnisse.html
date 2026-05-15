@@ -22,7 +22,7 @@
         <div class="card-body py-3">
             <form th:action="@{/suche}" method="get" class="d-flex gap-2">
                 <input type="text" name="q" class="form-control"
-                       placeholder="Suche in Aufgaben, Projekten, Mitarbeitern, Meetings..."
+                       placeholder="Suche in Aufgaben, Projekten, Mitarbeitern..."
                        th:value="${q}" autofocus>
                 <button type="submit" class="btn btn-primary text-nowrap">
                     <i class="bi bi-search me-1"></i>Suchen
@@ -95,28 +95,10 @@
             </div>
         </div>
 
-        <!-- Meetings -->
-        <div th:if="${meetings != null and !#lists.isEmpty(meetings)}" class="mb-4">
-            <h6 class="text-muted text-uppercase fw-semibold mb-2" style="font-size:.7rem; letter-spacing:.05em">
-                <i class="bi bi-camera-video me-1"></i>Meetings
-                <span class="badge bg-secondary ms-1" th:text="${#lists.size(meetings)}"></span>
-            </h6>
-            <div class="card card-custom">
-                <div th:each="m : ${meetings}" class="d-flex align-items-center px-3 py-2 border-bottom">
-                    <div class="flex-grow-1 overflow-hidden">
-                        <a th:href="@{/meetings/{id}(id=${m.id})}"
-                           th:text="${m.titel}"
-                           class="text-decoration-none text-dark fw-medium"></a>
-                    </div>
-                </div>
-            </div>
-        </div>
-
         <!-- Keine Ergebnisse -->
         <div th:if="${(aufgaben == null or #lists.isEmpty(aufgaben)) and
                       (projekte == null or #lists.isEmpty(projekte)) and
-                      (mitarbeiter == null or #lists.isEmpty(mitarbeiter)) and
-                      (meetings == null or #lists.isEmpty(meetings))}"
+                      (mitarbeiter == null or #lists.isEmpty(mitarbeiter))}"
              class="empty-state card-custom">
             <i class="bi bi-search text-muted" style="font-size:3rem"></i>
             <h5 class="mt-3 text-muted">Keine Ergebnisse für „<span th:text="${q}"></span>"</h5>

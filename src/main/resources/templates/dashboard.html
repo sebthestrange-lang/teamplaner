@@ -83,7 +83,7 @@
         <!-- Stat: Überfällig (1 breit) -->
         <div class="grid-stack-item" gs-x="9" gs-y="0" gs-w="3" gs-h="2" gs-id="stat-ueberfaellig">
             <div class="grid-stack-item-content">
-                <a th:href="@{/aufgaben(status='OFFEN')}" class="stat-card h-100 m-0 rounded-3 text-decoration-none stat-card-link">
+                <a th:href="@{/aufgaben(faelligkeit='ueberfaellig')}" class="stat-card h-100 m-0 rounded-3 text-decoration-none stat-card-link">
                     <div class="stat-icon bg-danger-soft text-danger"><i class="bi bi-exclamation-triangle-fill"></i></div>
                     <div>
                         <div class="stat-value text-danger" th:text="${ueberfaelligeAufgaben}">0</div>

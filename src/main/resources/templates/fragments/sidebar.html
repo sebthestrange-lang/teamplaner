@@ -38,7 +38,7 @@
         <form th:action="@{/suche}" method="get">
             <div class="input-group input-group-sm">
                 <input type="text" name="q" class="form-control sidebar-search-input"
-                       placeholder="Suchen...">
+                       placeholder="Suchen..." th:value="${param.q}">
                 <button type="submit" class="btn btn-sm sidebar-search-btn">
                     <i class="bi bi-search"></i>
                 </button>

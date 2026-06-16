@@ -105,7 +105,8 @@
                                 th:selected="${filter.tagId == tag.id}"></option>
                     </select>
                 </div>
-                <div class="col-6 col-md-2 d-flex gap-1 align-self-end">
+                <div class="col-6 col-md-2 d-flex gap-1 align-self-end"
+                     th:if="${filter.teamId != null or filter.mitarbeiterId != null or filter.projektId != null or filter.status != null or filter.prioritaet != null or #strings.hasText(filter.faelligkeit) or #strings.hasText(filter.suche) or filter.tagId != null}">
                     <a th:href="@{/aufgaben}" class="btn btn-sm btn-light w-100" title="Filter zurücksetzen">
                         <i class="bi bi-x-lg me-1"></i>Zurücksetzen
                     </a>
@@ -131,7 +132,7 @@
                         <th>Priorität</th>
                         <th>Status</th>
                         <th class="d-none d-sm-table-cell">Fällig</th>
-                        <th class="text-end">Aktionen</th>
+                        <th class="text-end no-sort">Aktionen</th>
                     </tr>
                 </thead>
                 <tbody>

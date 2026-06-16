@@ -34,7 +34,7 @@
                             <label for="anzeigename" class="form-label">Anzeigename <span class="text-danger">*</span></label>
                             <input type="text" id="anzeigename" th:field="*{anzeigename}"
                                    th:class="'form-control' + (${#fields.hasErrors('anzeigename')} ? ' is-invalid' : '')"
-                                   placeholder="Max Mustermann">
+                                   placeholder="Max Mustermann" autofocus>
                             <div th:if="${#fields.hasErrors('anzeigename')}" class="invalid-feedback"
                                  th:errors="*{anzeigename}"></div>
                         </div>

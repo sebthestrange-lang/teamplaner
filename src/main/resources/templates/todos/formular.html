@@ -29,7 +29,7 @@
                             <label for="titel" class="form-label">Titel <span class="text-danger">*</span></label>
                             <input type="text" id="titel" th:field="*{titel}"
                                    th:class="'form-control' + (${#fields.hasErrors('titel')} ? ' is-invalid' : '')"
-                                   placeholder="Was muss erledigt werden?">
+                                   placeholder="Was muss erledigt werden?" autofocus>
                             <div th:if="${#fields.hasErrors('titel')}" class="invalid-feedback"
                                  th:errors="*{titel}"></div>
                         </div>

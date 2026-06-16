@@ -83,7 +83,8 @@
                     <button type="submit" class="btn btn-sm btn-outline-secondary">
                         <i class="bi bi-search"></i>
                     </button>
-                    <a th:href="@{/todos}" class="btn btn-sm btn-light">
+                    <a th:href="@{/todos}" class="btn btn-sm btn-light"
+                       th:if="${#strings.hasText(filter.suche)}">
                         <i class="bi bi-x-lg"></i>
                     </a>
                 </div>

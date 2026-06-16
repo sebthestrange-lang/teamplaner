@@ -643,3 +643,8 @@ body {
         min-height: 80px;
     }
 }
+
+/* Tabellen-Sortierung */
+table.table thead th:not(.no-sort):hover { background-color: rgba(0,0,0,.04); }
+table.table thead th.sort-asc::after  { content: ' ↑'; opacity: .6; font-size: .75em; }
+table.table thead th.sort-desc::after { content: ' ↓'; opacity: .6; font-size: .75em; }

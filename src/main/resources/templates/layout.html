@@ -80,7 +80,10 @@
 <script>
     // Toasts automatisch anzeigen
     document.addEventListener('DOMContentLoaded', function () {
-        document.querySelectorAll('.toast').forEach(el => new bootstrap.Toast(el, {delay: 3500}).show());
+        document.querySelectorAll('.toast').forEach(el => {
+            const autohide = !el.classList.contains('text-bg-danger');
+            new bootstrap.Toast(el, {delay: 3500, autohide}).show();
+        });
     });
 
     // Lösch-Modal befüllen
@@ -88,6 +91,32 @@
         document.getElementById('loeschenForm').action = actionUrl;
         new bootstrap.Modal(document.getElementById('loeschenModal')).show();
     }
+
+    // Tabellen clientseitig sortierbar machen
+    document.addEventListener('DOMContentLoaded', function () {
+        document.querySelectorAll('table.table').forEach(table => {
+            const headers = table.querySelectorAll('thead th');
+            headers.forEach((th, colIdx) => {
+                if (th.classList.contains('no-sort')) return;
+                th.style.cursor = 'pointer';
+                th.style.userSelect = 'none';
+                let asc = true;
+                th.addEventListener('click', () => {
+                    const tbody = table.querySelector('tbody');
+                    const rows = Array.from(tbody.querySelectorAll('tr'));
+                    rows.sort((a, b) => {
+                        const aText = a.cells[colIdx]?.innerText.trim() ?? '';
+                        const bText = b.cells[colIdx]?.innerText.trim() ?? '';
+                        return asc ? aText.localeCompare(bText, 'de') : bText.localeCompare(aText, 'de');
+                    });
+                    rows.forEach(r => tbody.appendChild(r));
+                    headers.forEach(h => h.classList.remove('sort-asc', 'sort-desc'));
+                    th.classList.add(asc ? 'sort-asc' : 'sort-desc');
+                    asc = !asc;
+                });
+            });
+        });
+    });
 </script>
 <th:block layout:fragment="scripts"></th:block>
 </body>

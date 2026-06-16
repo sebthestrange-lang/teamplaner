@@ -178,8 +178,10 @@ public class AufgabeController {
 
     @PostMapping("/{id}/abhaengigkeit")
     public String abhaengigkeitHinzufuegen(@PathVariable Long id,
-                                           @RequestParam Long blockiertVonId) {
-        aufgabeService.abhaengigkeitHinzufuegen(id, blockiertVonId);
+                                           @RequestParam(required = false) Long blockiertVonId) {
+        if (blockiertVonId != null) {
+            aufgabeService.abhaengigkeitHinzufuegen(id, blockiertVonId);
+        }
         return "redirect:/aufgaben/" + id;
     }
 

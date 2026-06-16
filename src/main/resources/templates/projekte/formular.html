@@ -29,7 +29,7 @@
                             <label for="name" class="form-label">Name <span class="text-danger">*</span></label>
                             <input type="text" id="name" th:field="*{name}"
                                    th:class="'form-control' + (${#fields.hasErrors('name')} ? ' is-invalid' : '')"
-                                   placeholder="Projektname">
+                                   placeholder="Projektname" autofocus>
                             <div th:if="${#fields.hasErrors('name')}" class="invalid-feedback"
                                  th:errors="*{name}"></div>
                         </div>

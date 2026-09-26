@@ -1,5 +1,17 @@
 package de.teamplaner.controller;
 
+import java.util.List;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
 import de.teamplaner.dto.ProjektFilterDTO;
 import de.teamplaner.model.Aufgabe;
 import de.teamplaner.model.Projekt;
@@ -10,13 +22,6 @@ import de.teamplaner.service.ProjektService;
 import de.teamplaner.service.TeamService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-
-import java.util.List;
 
 @Controller
 @RequestMapping("/projekte")
@@ -112,6 +117,7 @@ public class ProjektController {
         projekt.setFarbe(formDaten.getFarbe());
         projekt.setFaelligAm(formDaten.getFaelligAm());
         projekt.setTeam(formDaten.getTeam());
+        projekt.setPmLink(formDaten.getPmLink());
         projektService.speichern(projekt);
         redirectAttributes.addFlashAttribute("erfolgsMeldung", "Projekt wurde aktualisiert.");
         return "redirect:/projekte/" + id;

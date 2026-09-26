@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}"
+      lang="de">
+<head><title>Sicherung</title></head>
+<body>
+<main layout:fragment="content">
+    <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a th:href="@{/}">Dashboard</a></li>
+            <li class="breadcrumb-item active">Sicherung</li>
+        </ol>
+    </nav>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-6">
+            <div class="card card-custom">
+                <div class="card-header-custom">
+                    <h5 class="mb-0">Daten sichern / wiederherstellen</h5>
+                </div>
+                <div class="card-body">
+                    <form th:action="@{/admin/backup/create}" method="post">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-download"></i> Backup erstellen und herunterladen
+                        </button>
+                    </form>
+
+                    <hr/>
+
+                    <form th:action="@{/admin/backup/restore}" method="post" enctype="multipart/form-data" class="mt-3">
+                        <div class="mb-3">
+                            <label for="file" class="form-label">SQL-Datei hochladen</label>
+                            <input type="file" id="file" name="file" class="form-control">
+                        </div>
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-warning">Hochladen</button>
+                            <a th:href="@{/}" class="btn btn-light">Abbrechen</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+</body>
+</html>

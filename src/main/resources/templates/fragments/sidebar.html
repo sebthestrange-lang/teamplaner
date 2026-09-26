@@ -116,6 +116,15 @@
             </a>
         </li>
 
+        <li class="nav-item" sec:authorize="hasRole('ADMIN')">
+            <a th:href="@{/admin/backup}"
+               th:classappend="${currentUri?.startsWith('/admin/backup')} ? 'active' : ''"
+               class="nav-link sidebar-link">
+                <i class="bi bi-cloud-arrow-down"></i>
+                <span>Sicherung</span>
+            </a>
+        </li>
+
         <li class="sidebar-section-label">Aufgaben</li>
 
         <li class="nav-item">
